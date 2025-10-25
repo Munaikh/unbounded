@@ -44,7 +44,15 @@ class LargeCard extends StatelessWidget {
               SizedBox(
                 height: 200,
                 width: double.infinity,
-                child: Image.network(imageUrl, fit: BoxFit.cover),
+                child: _isValidImageUrl(imageUrl)
+                    ? Image.network(
+                        imageUrl,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(color: context.colors.primary.withValues(alpha: 0.35));
+                        },
+                      )
+                    : Container(color: context.colors.primary.withValues(alpha: 0.35)),
               ),
               Container(
                 width: double.infinity,
@@ -116,5 +124,17 @@ class LargeCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  bool _isValidImageUrl(String url) {
+    if (url.isEmpty) {
+      return false;
+    }
+    try {
+      final Uri uri = Uri.parse(url);
+      return uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
+    } catch (e) {
+      return false;
+    }
   }
 }

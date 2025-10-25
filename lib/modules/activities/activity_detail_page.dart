@@ -27,19 +27,11 @@ class ActivityDetailPage extends ConsumerWidget {
             }
           }
           if (activity == null) {
-            return Center(
-              child: Text(
-                'Activity not found',
-                style: context.textTheme.bodyLarge,
-              ),
-            );
+            return Center(child: Text('Activity not found', style: context.textTheme.bodyLarge));
           }
 
           final double headerHeight = MediaQuery.of(context).size.height * 0.35;
-          final String distanceLabel = _computeDistanceLabel(
-            ref,
-            activity.location,
-          );
+          final String distanceLabel = _computeDistanceLabel(ref, activity.location);
 
           return CustomScrollView(
             slivers: [
@@ -47,19 +39,20 @@ class ActivityDetailPage extends ConsumerWidget {
                 expandedHeight: headerHeight,
                 backgroundColor: Colors.transparent,
                 elevation: 0,
-                pinned: false,
-                floating: false,
                 automaticallyImplyLeading: false,
                 flexibleSpace: Stack(
                   fit: StackFit.expand,
                   children: [
-                    (activity.imageUrl != null && activity.imageUrl!.isNotEmpty)
-                        ? Image.network(activity.imageUrl!, fit: BoxFit.cover)
-                        : Container(
-                            color: context.colors.primary.withCustomOpacity(
-                              0.35,
-                            ),
-                          ),
+                    if (_isValidImageUrl(activity.imageUrl))
+                      Image.network(
+                        activity.imageUrl ?? '',
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(color: context.colors.primary.withCustomOpacity(0.35));
+                        },
+                      )
+                    else
+                      Container(color: context.colors.primary.withCustomOpacity(0.35)),
                     SafeArea(
                       child: Align(
                         alignment: Alignment.topLeft,
@@ -83,113 +76,100 @@ class ActivityDetailPage extends ConsumerWidget {
                   top: false,
                   left: false,
                   right: false,
-                  bottom: true,
                   minimum: const EdgeInsets.only(bottom: 16),
                   child: Transform.translate(
                     offset: const Offset(0, 20),
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                       child: Container(
-                      decoration: ShapeDecoration(
-                        shape: RoundedSuperellipseBorder(
-                          borderRadius: BorderRadius.circular(32),
+                        decoration: ShapeDecoration(
+                          shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(32)),
+                          color: context.colors.surface,
                         ),
-                        color: context.colors.surface,
-                      ),
-                      padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  activity.name,
-                                  style: context.textTheme.headlineSmall,
+                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    activity.name,
+                                    style: context.textTheme.headlineSmall,
+                                  ),
                                 ),
-                              ),
-                              if (activity.cost != null)
-                                Text(
-                                  '£ ${activity.cost} per person',
-                                  style: context.textTheme.titleMedium
-                                      ?.copyWith(
-                                        color: context.colors.onSurface,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          Row(
-                            children: [
-                              if (activity.minGroupSize != null)
-                                _InfoChip(
-                                  label: 'Group ${activity.minGroupSize!}+',
-                                ),
-                              if (distanceLabel.isNotEmpty) ...[
-                                const SizedBox(width: 12),
-                                _InfoChip(label: distanceLabel),
+                                if (activity.cost != null)
+                                  Text(
+                                    '£ ${activity.cost} per person',
+                                    style: context.textTheme.titleMedium?.copyWith(
+                                      color: context.colors.onSurface,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
                               ],
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          if ((activity.description ?? '').isNotEmpty)
-                            Text(
-                              activity.description!,
-                              style: context.textTheme.bodyLarge?.copyWith(
-                                color: context.colors.onBackground.withValues(
-                                  alpha: 0.8,
-                                ),
-                                height: 1.5,
-                              ),
                             ),
-                          const SizedBox(height: 32),
-                          if ((activity.website ?? '').isNotEmpty)
-                            PressableScale(
-                              child: GestureDetector(
-                                onTap: () => _openWebsite(activity!.website!),
-                                child: Container(
-                                  width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 18,
-                                  ),
-                                  decoration: ShapeDecoration(
-                                    shape: RoundedSuperellipseBorder(
-                                      borderRadius: BorderRadius.circular(100),
-                                    ),
-                                    color: context.colors.primary,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      'Go to website',
-                                      style: context.textTheme.titleMedium
-                                          ?.copyWith(
-                                            color: context.colors.onPrimary,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                    ),
-                                  ),
+                            const SizedBox(height: 16),
+                            Row(
+                              children: [
+                                if (activity.minGroupSize != null)
+                                  _InfoChip(label: 'Group ${activity.minGroupSize!}+'),
+                                if (distanceLabel.isNotEmpty) ...[
+                                  const SizedBox(width: 12),
+                                  _InfoChip(label: distanceLabel),
+                                ],
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            if ((activity.description ?? '').isNotEmpty)
+                              Text(
+                                activity.description!,
+                                style: context.textTheme.bodyLarge?.copyWith(
+                                  color: context.colors.onBackground.withValues(alpha: 0.8),
+                                  height: 1.5,
                                 ),
                               ),
-                            ),
-                        ],
+                            const SizedBox(height: 32),
+                            if ((activity.website ?? '').isNotEmpty)
+                              PressableScale(
+                                child: GestureDetector(
+                                  onTap: () => _openWebsite(activity!.website!),
+                                  child: Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 18,
+                                    ),
+                                    decoration: ShapeDecoration(
+                                      shape: RoundedSuperellipseBorder(
+                                        borderRadius: BorderRadius.circular(100),
+                                      ),
+                                      color: context.colors.primary,
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'Go to website',
+                                        style: context.textTheme.titleMedium?.copyWith(
+                                          color: context.colors.onPrimary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
                 ),
-                ),
               ),
-              SliverToBoxAdapter(
-                child: const SizedBox(height: 16),
-              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 16)),
             ],
           );
         },
-        error: (err, _) => Center(
-          child: Text(err.toString(), style: context.textTheme.bodyLarge),
-        ),
+        error: (err, _) => Center(child: Text(err.toString(), style: context.textTheme.bodyLarge)),
         loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
@@ -222,6 +202,18 @@ class ActivityDetailPage extends ConsumerWidget {
     final Uri uri = Uri.parse(url);
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
+
+  bool _isValidImageUrl(String? url) {
+    if (url == null || url.isEmpty) {
+      return false;
+    }
+    try {
+      final Uri uri = Uri.parse(url);
+      return uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 class _InfoChip extends StatelessWidget {
@@ -233,9 +225,7 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: ShapeDecoration(
-        shape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(100),
-        ),
+        shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(100)),
         color: context.colors.primary.withCustomOpacity(0.10),
       ),
       child: Text(
