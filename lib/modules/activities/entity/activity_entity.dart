@@ -9,6 +9,7 @@ part 'activity_entity.g.dart';
 
 @freezed
 abstract class ActivityEntity with _$ActivityEntity {
+  @JsonSerializable(fieldRename: FieldRename.snake, explicitToJson: true)
   const factory ActivityEntity({
     required int id,
     required DateTime createdAt,

@@ -1,5 +1,6 @@
 import 'package:apparence_kit/core/data/api/base_api_exceptions.dart';
 import 'package:apparence_kit/modules/activities/entity/activity_entity.dart';
+import 'package:logger/logger.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -15,8 +16,9 @@ class ActivitiesApi {
   static const String tableName = 'activities';
   Future<List<ActivityEntity>> getActivities() async {
     try {
-      final response = await client.from(tableName).select('id');
-      return response.map((e) => ActivityEntity.fromJson(e)).toList();
+      final response = await client.from(tableName).select('*').then((value) => value as List<dynamic>,);
+      Logger().i('🚨 Activities: ${response}');
+      return response.map<ActivityEntity>((e) => ActivityEntity.fromJson(e as Map<String, dynamic>)).toList();
     } catch (e, stacktrace) {
       throw ApiError(
         code: 0,
