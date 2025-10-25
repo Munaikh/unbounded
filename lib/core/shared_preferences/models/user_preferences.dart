@@ -13,15 +13,10 @@ abstract class UserPreferences with _$UserPreferences {
     bool? surpriseMe,
   }) = _UserPreferences;
 
-  factory UserPreferences.fromJson(Map<String, dynamic> json) =>
-      _$UserPreferencesFromJson(json);
+  factory UserPreferences.fromJson(Map<String, dynamic> json) => _$UserPreferencesFromJson(json);
 
   const UserPreferences._();
 
   bool get hasPreferences =>
-      minPeople != null ||
-      maxPeople != null ||
-      budgetPerPerson != null ||
-      activityType != null;
+      minPeople != null || maxPeople != null || budgetPerPerson != null || activityType != null;
 }
-
