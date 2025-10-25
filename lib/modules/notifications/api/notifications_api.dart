@@ -99,12 +99,12 @@ class FirebaseNotificationsApi implements NotificationsApi {
 
   @override
   void registerTopic(String topic) {
-    _messaging.subscribeToTopic(topic);
+    // _messaging.subscribeToTopic(topic);
   }
 
   @override
   void unregisterTopic(String topic) {
-    _messaging.unsubscribeFromTopic(topic);
+    // _messaging.unsubscribeFromTopic(topic);
   }
 
   // Used to get the past notifications from the server

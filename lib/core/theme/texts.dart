@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ApparenceKitTextTheme extends ThemeExtension<ApparenceKitTextTheme> {
   final TextStyle primary;
@@ -7,12 +8,8 @@ class ApparenceKitTextTheme extends ThemeExtension<ApparenceKitTextTheme> {
     required this.primary,
   });
 
-  factory ApparenceKitTextTheme.build() => const ApparenceKitTextTheme(
-        primary: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w400,
-          color: Color(0xFF000000),
-        ),
+  factory ApparenceKitTextTheme.build() =>  ApparenceKitTextTheme(
+        primary: GoogleFonts.montserrat(fontSize: 16, fontWeight: FontWeight.w400),
       );
 
   @override
