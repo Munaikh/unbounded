@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 class CustomBottomBar extends BartBottomBarFactory {
   final double blur = 15;
   final double opacity = 0.7;
-  final double borderRadius = 0;
+  final double borderRadius = 24;
   final double padding = 8;
 
   BottomMenuItem getBottomMenuItem(
@@ -40,13 +40,7 @@ class CustomBottomBar extends BartBottomBarFactory {
         child: Container(
           padding: EdgeInsets.all(padding),
           decoration: BoxDecoration(
-            color: context.colors.surface.withCustomOpacity(opacity),
-            border: Border(
-              top: BorderSide(
-                color: context.colors.outline.withCustomOpacity(0.2),
-                width: 1.5,
-              ),
-            ),
+            color: context.colors.surface,
           ),
           child: SafeArea(
             top: false,
