@@ -67,7 +67,9 @@ class HomePage extends ConsumerWidget {
                               // Refresh activities list
                               ref.invalidate(filteredActivitiesProvider);
                               if (context.mounted) {
-                                ref.read(toastProvider).success(title: 'Filters cleared', text: 'Filters cleared');
+                                ref
+                                    .read(toastProvider)
+                                    .success(title: 'Filters cleared', text: 'Filters cleared');
                               }
                             },
                             child: PressableScale(

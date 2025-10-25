@@ -74,7 +74,9 @@ class _PersonalizationWizardState extends ConsumerState<PersonalizationWizard> {
     }
 
     if (mounted) {
-      ref.read(toastProvider).success(title: 'Preferences saved', text: 'Preferences saved: ${selections.join(', ')}');
+      ref
+          .read(toastProvider)
+          .success(title: 'Preferences saved', text: 'Preferences saved: ${selections.join(', ')}');
       // ScaffoldMessenger.of(context).showSnackBar(
       //   SnackBar(
       //     content: Text('Preferences saved: ${selections.join(', ')}'),
