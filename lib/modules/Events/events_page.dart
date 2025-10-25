@@ -1,13 +1,10 @@
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
-import 'package:apparence_kit/core/states/user_state_notifier.dart';
 import 'package:apparence_kit/modules/Events/event_card.dart';
 import 'package:apparence_kit/modules/Events/providers/all_events_provider.dart';
-import 'package:apparence_kit/modules/Events/providers/event_participants_by_event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class EventsPage extends ConsumerWidget {
   const EventsPage({super.key});
@@ -15,13 +12,6 @@ class EventsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final eventsAsync = ref.watch(allEventsProvider);
-    final userState = ref.watch(userStateNotifierProvider);
-    final userId = userState.user.idOrNull;
-    final gradients = const [
-      [Color(0xFFBFA8FF), Color(0xFF6857C9), Color(0xFF4B35F2)],
-      [Color(0xFFFF7C7C), Color(0xFFF35252), Color(0xFFE13B3B)],
-      [Color(0xFF6AE7FF), Color(0xFF3AC0F2), Color(0xFF1C88E5)],
-    ];
     return Scaffold(
       backgroundColor: context.colors.background,
       body: SafeArea(
@@ -30,65 +20,42 @@ class EventsPage extends ConsumerWidget {
           children: [
             Text('Events', style: context.textTheme.headlineLarge),
             const SizedBox(height: 12),
-            SizedBox(
-              height: 420,
-              child: eventsAsync.when(
-                data: (events) {
-                  if (events.isEmpty) {
-                    return Center(
-                      child: Text(
-                        'No events yet',
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: context.colors.onBackground.withValues(alpha: 0.6),
-                        ),
-                      ),
-                    );
-                  }
-                  return ListView.separated(
+            eventsAsync.when(
+              data: (events) {
+                if (events.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return SizedBox(
+                  height: 420,
+                  child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: events.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 16),
                     itemBuilder: (context, index) {
-                      final event = events[index];
-                      final participantsAsync = ref.watch(
-                        eventParticipantsByEventProvider(eventId: event.id),
-                      );
-                      final participantsInitials = participantsAsync.maybeWhen(
-                        data: (list) => list
-                            .map((p) => p.userId.substring(0, 2).toUpperCase())
-                            .toList(),
-                        orElse: () => const <String>[],
-                      );
-                      final isGoing = participantsAsync.maybeWhen(
-                        data: (list) => userId != null && list.any((p) => p.userId == userId),
-                        orElse: () => false,
-                      );
-                      final statusLabel = isGoing ? 'Going' : 'Invited';
-                      final gradientColors = gradients[index % gradients.length];
-                      final dateStr = event.date != null
-                          ? DateFormat('EEE, d MMMM, h:mma').format(event.date!.toLocal())
-                          : 'Date TBD';
-                      final location = event.location ?? 'Unknown';
+                      final e = events[index];
+                      final displayDate = e.date != null
+                          ? '${e.date!.toLocal()}'
+                          : '';
                       return EventCard(
-                        title: event.title,
-                        date: dateStr,
-                        location: location,
-                        statusLabel: statusLabel,
-                        gradientColors: gradientColors,
-                        participants: participantsInitials,
+                        title: e.title,
+                        date: displayDate,
+                        location: e.location ?? '',
+                        statusLabel: 'Invited',
+                        gradientColors: const [
+                          Color(0xFFBFA8FF),
+                          Color(0xFF6857C9),
+                          Color(0xFF4B35F2),
+                        ],
+                        participants: const ['AA', 'MA', 'KH'],
                       );
                     },
-                    separatorBuilder: (context, _) => const SizedBox(width: 16),
-                  );
-                },
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, _) => Center(
-                  child: Text(
-                    'Failed to load events',
-                    style: context.textTheme.bodyMedium?.copyWith(
-                      color: context.colors.onBackground.withValues(alpha: 0.6),
-                    ),
                   ),
-                ),
+                );
+              },
+              error: (err, _) => Text('$err'),
+              loading: () => const SizedBox(
+                height: 420,
+                child: Center(child: CircularProgressIndicator()),
               ),
             ),
             const SizedBox(height: 32),

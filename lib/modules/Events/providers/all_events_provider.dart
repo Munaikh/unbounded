@@ -9,3 +9,4 @@ Future<List<EventEntity>> allEvents(Ref ref) async {
   final api = ref.watch(eventsApiProvider);
   return await api.getEvents();
 }
+
