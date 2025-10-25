@@ -1,6 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:apparence_kit/core/bottom_menu/bottom_menu_item.dart';
 import 'package:apparence_kit/core/widgets/page_not_found.dart';
+import 'package:apparence_kit/modules/Events/events_page.dart';
 import 'package:apparence_kit/modules/home/home_page.dart';
 import 'package:bart/bart.dart';
 import 'package:flutter/material.dart';
@@ -22,15 +23,15 @@ List<BartMenuRoute> subRoutes() {
       transitionsBuilder: bottomBarTransition,
     ),
     BartMenuRoute.bottomBarBuilder(
-      label: "Invites",
-      path: 'invites',
+      label: "Events",
+      path: 'events',
       builder: (context, isActive) => BottomMenuItem(
         isSelected: isActive,
         icon: Ionicons.people,
         iconOutline: Ionicons.people_outline,
-        label: "Invites",
+        label: "Events",
       ),
-      pageBuilder: (_, _, settings) => const PageNotFound(),
+      pageBuilder: (_, _, settings) => const EventsPage(),
       transitionDuration: bottomBarTransitionDuration,
       transitionsBuilder: bottomBarTransition,
     ),
