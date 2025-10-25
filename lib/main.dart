@@ -128,7 +128,7 @@ class MyApp extends ConsumerWidget {
         lightColors: ApparenceKitColors.light(),
         darkColors: ApparenceKitColors.dark(),
         textTheme: ApparenceKitTextTheme.build(),
-        defaultMode: ThemeMode.light,
+        defaultMode: ThemeMode.system,
       ),
       child: Builder(builder: (context) {
         return MaterialApp.router(
