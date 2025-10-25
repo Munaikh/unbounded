@@ -179,6 +179,7 @@ class ActivityDetailPage extends ConsumerWidget {
                     ),
                   ),
                 ),
+                ),
               ),
             ],
           );
