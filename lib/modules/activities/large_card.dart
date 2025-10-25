@@ -1,6 +1,8 @@
+import 'package:apparence_kit/core/location/providers/user_location_provider.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class LargeCard extends StatelessWidget {
   final String imageUrl;
@@ -67,11 +69,34 @@ class LargeCard extends StatelessWidget {
                         color: context.colors.primary,
                       ),
                       const SizedBox(width: 4),
-                      Text(
-                        distance,
-                        style: context.textTheme.bodyMedium?.copyWith(
-                          color: context.colors.primary,
-                        ),
+                      Consumer(
+                        builder: (context, ref, child) {
+                          final parts = distance.split(',');
+                          var finalDistance = 'N/A';
+                          if (parts.length == 2) {
+                            final lat = double.tryParse(parts[0].trim());
+                            final lng = double.tryParse(parts[1].trim());
+                            if (lat != null && lng != null) {
+                              final userLocation = ref.watch(
+                                userLocationProvider.notifier,
+                              );
+                              userLocation.getUserLocation();
+                              final distanceMeters = userLocation.getDistanceTo(
+                                lat,
+                                lng,
+                              );
+                              final distanceKm = (distanceMeters / 1000)
+                                  .toStringAsFixed(1);
+                              finalDistance = '$distanceKm km';
+                            }
+                          }
+                          return Text(
+                            finalDistance,
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: context.colors.primary,
+                            ),
+                          );
+                        }
                       ),
                       const SizedBox(width: 16),
                       Text(

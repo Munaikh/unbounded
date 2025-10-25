@@ -79,16 +79,25 @@ class HomePage extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.end,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
                                 decoration: ShapeDecoration(
                                   shape: RoundedSuperellipseBorder(
                                     borderRadius: BorderRadius.circular(100),
                                   ),
                                   color: context.colors.primary,
                                 ),
-                                child: PressableScale(child: Text('Personalize', style: context.textTheme.titleSmall?.copyWith(
-                                  color: context.colors.background,
-                                ))),
+                                child: PressableScale(
+                                  child: Text(
+                                    'Personalize',
+                                    style: context.textTheme.titleSmall
+                                        ?.copyWith(
+                                          color: context.colors.background,
+                                        ),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -99,49 +108,49 @@ class HomePage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              Text('Top picks for you', style: context.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w600,
-              )),
-              const SizedBox(height: 12),
-              activities.maybeWhen(
-                orElse: () => const SizedBox.shrink(),
-                data: (activity) => SizedBox(
-                  height: 230,
-                  width: (MediaQuery.of(context).size.width) * .7,
-                  child: ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: activity.length,
-                    itemBuilder: (context, index) {
-                      print(activity[index].imageUrl);
-                      return LargeCard(
-                        imageUrl: activity[index].imageUrl ?? '',
-                        title: activity[index].name,
-                        description: activity[index].description ?? '',
-                        price: activity[index].cost ?? 0,
-                        minGroupSize: activity[index].minGroupSize ?? 0,
-                        maxGroupSize: activity[index].maxGroupSize ?? 0,
-                        distance: (() {
-                          final locationString = activity[index].location;
-                          if (locationString != null) {
-                            final parts = locationString.split(',');
-                            if (parts.length == 2) {
-                              final lat = double.tryParse(parts[0].trim());
-                              final lng = double.tryParse(parts[1].trim());
-                              if (lat != null && lng != null) {
-                                final userLocation = ref.watch(userLocationProvider.notifier);
-                                final distanceMeters = userLocation.getDistanceTo(lat, lng);
-                                final distanceKm = (distanceMeters / 1000).toStringAsFixed(1);
-                                print(distanceKm);
-                                return '$distanceKm km';
-                              }
-                            }
-                          }
-                          return '';
-                        })(),
-                    );
-                  },
+              Text(
+                'Top picks for you',
+                style: context.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w600,
                 ),
               ),
+              const SizedBox(height: 12),
+              FutureBuilder(
+                future: ref
+                    .watch(userLocationProvider.notifier)
+                    .getUserLocation(),
+                builder: (context, asyncSnapshot) {
+                  if (asyncSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const SizedBox.shrink();
+                  }
+                  if (asyncSnapshot.hasData) {
+                    return activities.maybeWhen(
+                      orElse: () => const SizedBox.shrink(),
+                      data: (activity) => SizedBox(
+                        height: 230,
+                        width: (MediaQuery.of(context).size.width) * .7,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: activity.length,
+                          itemBuilder: (context, index) {
+                            final act = activity[index];
+                            return LargeCard(
+                              imageUrl: act.imageUrl ?? '',
+                              title: act.name,
+                              description: act.description ?? '',
+                              price: act.cost ?? 0,
+                              minGroupSize: activity[index].minGroupSize ?? 0,
+                              maxGroupSize: activity[index].maxGroupSize ?? 0,
+                              distance: act.location ?? '',
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
               ),
             ],
           ),
