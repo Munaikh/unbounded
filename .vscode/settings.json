@@ -3,5 +3,27 @@
     "[dart]": {
         "editor.formatOnSave": true
     },
-    "java.configuration.updateBuildConfiguration": "disabled"
+    "java.configuration.updateBuildConfiguration": "disabled",
+    // "files.exclude": {
+    //     "**/*.freezed.dart": true,
+    //     "**/*.g.dart": true
+    //   },
+      "explorer.fileNesting.enabled": true,
+      "explorer.fileNesting.expand": false,
+    "explorer.fileNesting.patterns": {
+        "*.dart": "${capture}.g.dart, ${capture}.freezed.dart"
+    },
+    "github.copilot.enable": {
+        "*": true,
+        "plaintext": true,
+        "markdown": true,
+        "scminput": false,
+        "yaml": true,
+        "dart": true,
+        "python": true,
+        "html": false,
+        "java": false,
+        "properties": true,
+        "javascript": false
+    },
 }
