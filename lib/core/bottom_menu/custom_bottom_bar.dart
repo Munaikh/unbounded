@@ -35,8 +35,8 @@ class CustomBottomBar extends BartBottomBarFactory {
          shadows: [
           BoxShadow(
             offset: const Offset(0, -1),
-            color: context.colors.shadow.withCustomOpacity(0.1),
-            blurRadius: 100,
+            color: context.colors.shadow.withCustomOpacity(0.05),
+            blurRadius: 10,
             spreadRadius: 2,
           ),
         ],
