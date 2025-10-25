@@ -1,0 +1,14 @@
+## This requires to run on a macos runner with Xcode installed and configured
+.deploy-app-store-connect:
+  tags:
+    - macos
+  only:
+    - master
+    - main
+  variables:
+    IPA_PATH: "build/ios/ipa/*.ipa"
+    API_KEY: ""
+    API_ISSUER: ""
+  script:
+    - "echo 'Deploying app to App Store Connect'"
+    - xcrun altool --upload-app --type ios -f $IPA_PATH --apiKey $API_KEY --apiIssuer $API_ISSUER

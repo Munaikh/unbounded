@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "626800146488",
+    "project_id": "unbounded-da560",
+    "storage_bucket": "unbounded-da560.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:626800146488:android:1365b5053d9c3f9dd6cecd",
+        "android_client_info": {
+          "package_name": "com.unbounded"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDF1AgGmUdw7fVHRQUSYRaAmai5DF8pkQA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

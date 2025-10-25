@@ -1,0 +1,227 @@
+variables:
+  FIREBASE_STAGING_ANDROID_APP_ID: "fill it" # fill it with yours (only if you use the firebase step)
+  FIREBASE_STAGING_IOS_APP_ID: "fill it" # fill it with yours  (only if you use the firebase step)
+  FIREBASE_TESTERS_GROUPS: "Group1Name, Group2name"  # fill it with yours (only if you use the firebase step)
+  APP_PROJECT_NAME: "Your App name" # fill it with yours
+  NOTIFY_EMAIL_FROM: "yourmail" # fill it with yours only if you use the notify step
+  NOTIFY_EMAILS: "" # fill it with yours only if you use the notify step
+  DROPBOX_LINK: "" # fill it with yours only if you use dropbox to distribute your app
+
+stages:
+  - Setup
+  - Test
+  # - Bump version
+  - Build
+  - Deploy
+  # - Notify
+
+include:
+  - '/.gitlab/templates/flutter.yaml'
+  - '/.gitlab/templates/dropbox.yaml'
+  - '/.gitlab/templates/deploy.yaml'
+  - '/.gitlab/templates/mailgun.yaml'
+
+setup:
+  stage: Setup
+  extends: .setup
+
+test:
+  stage: Test
+  extends: .tests-stable
+
+#######################
+## BUILD STAGING 
+#######################
+# This step is to build a staging version of your app
+# I like to send this version to my testers using Firebase App Distribution
+
+build_android_staging:
+  stage: Build
+  extends:
+    - .build-android-profile
+  needs: [setup, test]
+  only:
+    - main
+  variables:
+    # FLAVOR: "staging" # <- uncomment THIS ONLY IF YOU HAVE FLAVORS
+    PATH_TO_RUNNER: "lib/main.dart"
+    # uncomment this to add any environment keys from your Gitlab CI
+    # For more informations check https://docs.gitlab.com/ee/ci/variables/#variables
+    # ADDITIONAL_OPTIONS:  
+    #   "--dart-define=SENTRY_DSN=$SENTRY_API_KEY \
+    #   --dart-define=OTHER_KEY=$GITLAB_CI_VARIABLE \"
+
+build_ios_staging:
+  stage: Build
+  needs: [setup, test]
+  extends:
+    - .build-ios-ipa
+  only:
+    - main
+  variables:
+    # FLAVOR: "staging" # <- uncomment THIS ONLY IF YOU HAVE FLAVORS
+    METHOD: "ad-hoc" # ["ad-hoc", "app-store", "development", "enterprise"]
+    PATH_TO_RUNNER: "lib/main.dart"
+    # uncomment this to add any environment keys from your Gitlab CI
+    # For more informations check https://docs.gitlab.com/ee/ci/variables/#variables
+    # ADDITIONAL_OPTIONS:  
+    #   "--dart-define=SENTRY_DSN=$SENTRY_API_KEY \
+    #   --dart-define=OTHER_KEY=$GITLAB_CI_VARIABLE \"
+
+#######################
+## BUILD PRODUCTION 
+#######################
+
+build_android_production:
+  stage: Build
+  extends:
+    - .build-android-release
+  needs: [setup, test]
+  only:
+    - main
+  variables:
+    # FLAVOR: "production" # <- uncomment THIS ONLY IF YOU HAVE FLAVORS
+    PATH_TO_RUNNER: "lib/main.dart"
+    # uncomment this to add any environment keys from your Gitlab CI
+    # For more informations check https://docs.gitlab.com/ee/ci/variables/#variables
+    # ADDITIONAL_OPTIONS:  
+    #   "--dart-define=SENTRY_DSN=$SENTRY_API_KEY \
+    #   --dart-define=OTHER_KEY=$GITLAB_CI_VARIABLE \"
+
+build_ios_production:
+  stage: Build
+  needs: [setup, test]
+  extends:
+    - .build-ios-ipa
+  only:
+    - main
+  variables:
+    # FLAVOR: "staging" # <- uncomment THIS ONLY IF YOU HAVE FLAVORS
+    METHOD: "app-store" # ["ad-hoc", "app-store", "development", "enterprise"]
+    PATH_TO_RUNNER: "lib/main.dart"
+    # uncomment this to add any environment keys from your Gitlab CI
+    # For more informations check https://docs.gitlab.com/ee/ci/variables/#variables
+    # ADDITIONAL_OPTIONS:  
+    #   "--dart-define=SENTRY_DSN=$SENTRY_API_KEY \
+    #   --dart-define=OTHER_KEY=$GITLAB_CI_VARIABLE \"
+
+
+#######################
+## DEPLOY STAGING 
+#######################
+# If you want to distribute your app to your testers using Firebase App Distribution
+# You can uncomment this step
+# For more informations check https://firebase.google.com/docs/app-distribution
+# I like to put this as manual so I can choose when to distribute my app
+
+deploy_android_firebase:
+  stage: Deploy
+  extends: .firebase-deploy
+  only:
+    - main
+  dependencies:
+    - build_android_staging
+  variables:
+    PATH_TO_BINARY: "build/app/outputs/flutter-apk/app-release.apk"  # Use this only if you don't have flavors
+    # PATH_TO_BINARY: "build/app/outputs/flutter-apk/app-staging-release.apk" # <- uncomment THIS ONLY IF YOU HAVE FLAVORS
+    # Don't forget to update this varialble with your app id at the top of this file
+    FIREBASE_APP_ID: "$FIREBASE_STAGING_ANDROID_APP_ID"
+    # Don't forget to update this varialble with your app id at the top of this file
+    FIREBASE_TESTERS_GROUP: "$FIREBASE_TESTERS_GROUPS"
+    # Set this variable in your CI variable to protect your token
+    FIREBASE_CI_TOKEN: "$FIREBASE_TOKEN_PROJECT"
+  when: manual
+
+deploy_ios_firebase:
+  stage: Deploy
+  extends: .firebase-deploy
+  only:
+    - main
+  dependencies:
+    - build_ios_staging
+  variables:
+    PATH_TO_BINARY: "build/ios/ipa/app.ipa"
+    # Don't forget to update this varialble with your app id at the top of this file
+    FIREBASE_APP_ID: "$FIREBASE_STAGING_IOS_APP_ID" 
+    # Don't forget to update this varialble with your app id at the top of this file
+    FIREBASE_TESTERS_GROUP: "$FIREBASE_TESTERS_GROUPS"
+    # Set this variable in your CI variable to protect your token
+    FIREBASE_CI_TOKEN: "$FIREBASE_TOKEN_PROJECT"
+  when: manual
+
+
+# ######################
+# ## DEPLOY ON STORES ##
+# ######################
+
+deploy_ios_production_appstore:
+  stage: Deploy
+  extends: .deploy-ios-store
+  dependencies: [build_ios_production, read_version]
+  needs: [build_ios_production, read_version]
+  only:
+    - main
+
+## This steps allows to send the resulting appBundle using dropbox
+## We could push to the playstore but this requires some work with the playstore account owner
+## So I prefer to use dropbox to send the appBundle to the owner and he can upload it to the playstore
+## The notification step will send an email to the owner to notify him that a new version is available
+## Check the .gitlab/templates/dropbox.yaml file for more informations
+# ------------
+# deploy_android_production_appbundle:
+#   stage: Deploy
+#   extends: .dropbox
+#   variables:
+#     APP_FOLDER: $APP_PROJECT_NAME
+#     # FLAVOR: "prod"
+#     PATH_TO_BINARY: "build/app/outputs/bundle/productionRelease/app-production-release.aab"
+#   needs: [build_android_production, read_version]
+#   dependencies: [read_version, build_android_production]
+#   only:
+#     - master
+
+############
+## NOTIFY ##
+############
+# This step is to notify your team that a new version is available once the build is done
+# But you can use this also to notify from any step you want
+# 
+# before this you must define the following variables in your CI variables
+# MAILGUN_API_KEY the api key of your mailgun account
+# MAILGUN_DOMAIN the domain of your mailgun account ex : mg.yourdomain.com
+# And the variables at the top of this file
+# NOTIFY_EMAIL_FROM the email to send the notification from
+# NOTIFY_EMAILS the list of emails to notify
+
+# deploy:android:production:notify:
+#   stage: Notify
+#   extends: .send_email
+#   needs: [deploy_android_production_appbundle, read_version]
+#   dependencies: [read_version]
+#   variables:
+#     SUBJECT: "$APP_PROJECT_NAME: nouvelle release Android disponible"
+#     MAILGUN_API_KEY: $MAILGUN_API_KEY
+#     MAILGUN_DOMAIN: $MAILGUN_DOMAIN
+#     FROM: $NOTIFY_EMAIL_FROM
+#     HTML: "Un nouveau build Android est disponible pour l'application $APP_PROJECT_NAME :<br/>- App bundle: $DROPBOX_LINK"
+#     TO: $NOTIFY_EMAILS
+#   allow_failure: false
+#   only:
+#     - master
+
+
+# deploy:ios:production:notify:
+#   stage: Notify
+#   extends: .send_email
+#   needs: [deploy_ios_production_appstore, read_version]
+#   dependencies: [read_version]
+#   variables:
+#     SUBJECT: "$APP_PROJECT_NAME: nouvelle release iOS disponible"
+#     MAILGUN_API_KEY: $MAILGUN_API_KEY
+#     MAILGUN_DOMAIN: $MAILGUN_DOMAIN
+#     FROM: $NOTIFY_EMAIL_FROM
+#     HTML: "Un nouveau build iOS est disponible pour l'application $APP_PROJECT_NAME.<br/>Il sera visible d'ici quelques minutes sur la page Apple store de configuration de votre application."
+#     TO: $NOTIFY_EMAILS
+#   allow_failure: false
+#   only:
+#     - master

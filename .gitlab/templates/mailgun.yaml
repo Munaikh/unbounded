@@ -1,0 +1,28 @@
+.send_email:
+    variables:
+        FILENAME: ""
+        SUBJECT: ""
+        MAILGUN_API_KEY: ""
+        MAILGUN_DOMAIN: ""
+        FROM: ""
+        HTML: ""
+        TO: ""
+    script: curl -s --user "api:$MAILGUN_API_KEY" "https://api.eu.mailgun.net/v3/$MAILGUN_DOMAIN/messages" -F from=$FROM -F to=$TO -F subject="$SUBJECT" -F html="$HTML"
+        
+.send_email_attachment:
+    variables:
+        FILENAME: ""
+        SUBJECT: ""
+        MAILGUN_API_KEY: ""
+        MAILGUN_DOMAIN: ""
+        FROM: ""
+        HTML: ""
+        TO: ""
+    script: curl -s --user "api:$MAILGUN_API_KEY" 
+        "https://api.eu.mailgun.net/v3/$MAILGUN_DOMAIN/messages"
+        -F from=$FROM
+        -F to=$TO
+        -F subject="$SUBJECT"
+        -F attachment=$FILENAME
+        -F html="$HTML"
+       # -F attachment='@reports/report.html'

@@ -1,0 +1,47 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        // {
+        //     "name": "Tests",
+        //     "type": "dart",
+        //     "request": "launch",
+        //     "program": "./test/"
+        // },
+        {
+            "name": "Supabase - Development",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main.dart",
+            "args": [
+                "--dart-define=ENV=dev",
+                // "--dart-define=BACKEND_URL=",
+                // "--dart-define=SUPABASE_TOKEN=",
+                "--dart-define=BACKEND_URL=https://qkcccdrwdqqgpbahtngk.supabase.co",
+                "--dart-define=SUPABASE_TOKEN=sb_publishable_EzfAVWb-F2-uoUxNNsnB_A_JzYKjNX9",
+            ]
+        },
+        // {
+        //     "name": "HttpClient - Development",
+        //     "request": "launch",
+        //     "type": "dart",
+        //     "program": "lib/main.dart",
+        //     "args": [
+        //         "--dart-define=ENV=dev",
+        //         "--dart-define=BACKEND_URL=https://us-central1-apparencekit-pro.cloudfunctions.net/app",
+        //     ]
+        // },
+        // {
+        //     "name": "Firebase - Development",
+        //     "request": "launch",
+        //     "type": "dart",
+        //     "program": "lib/main.dart",
+        //     "args": [
+        //         "--dart-define=ENV=dev",
+        //         "--dart-define=BACKEND_URL=",
+        //     ]
+        // }
+    ]
+}

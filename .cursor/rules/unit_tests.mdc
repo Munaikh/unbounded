@@ -1,0 +1,139 @@
+---
+description: how to write unit tests
+globs: *.dart
+---
+These guidelines will help you write effective unit tests focusing on business logic using fake implementations rather than mocks.
+
+To create a fake of an API. Implements the API class like an interface
+
+example: 
+```dart
+class SubscriptionApiFake implements SubscriptionApi {
+  SubscriptionEntity? currentFake;
+
+  @override
+  Future<SubscriptionEntity?> get(String userId) {
+    return Future(() => currentFake);
+  }
+}
+```
+
+- Our fake doesn't rely on network
+- Our fake class is used within our test
+- It behaves like we want (we can provide it a subscription or not)
+
+## Why Use Fakes?
+- **Isolation**: Tests shouldn't depend on externals like APIs or databases.
+- **Stability**: Update tests only when business logic changes, not implementations.
+- **Readability**: Fakes simplify understanding and writing tests.
+
+## Provides fakes to Dependency Injection
+
+If you have to create a new fake. 
+Open the [test_utils.dart](mdc:test/test_utils.dart) file and add your new fake like this in the pumpPage
+
+```dart
+  Future<void> pumpPage({
+    UserState? userState,
+    SubscriptionApiFake? subscriptionApiFakeOverride,
+    Widget? home,
+    RouterConfig<Object>? routerConfig,
+    String? initialRoute,
+  }) async {
+    // await initFirebaseForTest();
+    SharedPreferences.setMockInitialValues({});
+    final sharedPrefs = await SharedPreferences.getInstance();
+    late WidgetRef refCopie;
+    await pumpWidget(
+      ProviderScope(
+        overrides: [
+          subscriptionApiProvider.overrideWithValue(
+            subscriptionApiFakeOverride ?? SubscriptionApiFake(),
+          ),
+        ],
+      ),
+    )
+  }
+```
+
+## How to define a test 
+- A test will be described as  '[CURRENT CONTEXT], [ACTION] => [EXPECTED RESULT]'
+- A test will use the pumpPage method from [test_utils.dart](mdc:test/test_utils.dart) to use fakes
+- If our context need an authenticated user we can provide it directly
+- We override GoRouter routing if we want to test navigation
+- Our tests try to test the app from a user point of view. (Ex: we test tap on an card that increment a counter instead of calling directly the increment function called by the card)
+
+
+For example 
+
+```dart
+void main() {
+  final authApiFake = FakeAuthenticationApi();
+  final storageFake = FakeAuthSecuredStorage.empty();
+
+  final authRepository = HttpAuthenticationRepository(
+    logger: Logger(),
+    authenticationApi: authApiFake,
+    storage: storageFake,
+    userApi: FakeUserApi(storageApi: FakeStorageApi()),
+    httpClient: HttpClient(baseUrl: ''),
+  );
+
+  Future<void> beforeTest(WidgetTester tester) async {
+    await tester.pumpPage(
+      authApiFakeOverride: authApiFake,
+      authSecuredStorageFakeOverride: storageFake,
+      routerConfig: GoRouter(
+        initialLocation: '/signin',
+        routes: [
+          GoRoute(
+            path: '/',
+            builder: (context, state) => const PageFake(Colors.blueAccent),
+          ),
+          GoRoute(
+            path: '/signin',
+            builder: (context, state) => const SigninPage(),
+          ),
+        ],
+      ),
+    );
+    await authRepository.logout();
+  }
+
+  testWidgets(
+    'fill valid email, password and submit => should be connected',
+    (tester) async {
+      await beforeTest(tester);
+
+      var auth = await authRepository.get();
+      expect(auth, isNull, reason: 'user should be not authenticated');
+
+      final emailInputFinder = find.byKey(const Key('email_input'));
+      final passwordInputFinder = find.byKey(const Key('password_input'));
+
+      // Enter text into the email and password input fields
+      await tester.enterText(emailInputFinder, validInputs.currentValue!.email);
+      await tester.enterText(
+        passwordInputFinder,
+        validInputs.currentValue!.password,
+      );
+      await tester.pumpAndSettle();
+
+      // Find and tap the send button
+      final sendButtonFinder = find.byKey(const Key('send_button'));
+      await tester.tap(sendButtonFinder);
+
+      // Wait for the state to update and our fake delay to finish
+      await tester.pump(const Duration(milliseconds: 1500));
+      await tester.pumpAndSettle(const Duration(milliseconds: 50));
+
+      auth = await authRepository.get();
+      expect(auth, isNotNull, reason: 'user should be authenticated');
+    },
+  );
+
+}
+```
+
+
+

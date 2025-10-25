@@ -1,0 +1,340 @@
+---
+description: Guidelines for Flutter and Dartr
+globs: **/*.dart
+---
+This is ApparenceKit guidelines
+Generate code, corrections, and refactorings that comply with the basic principles and nomenclature.
+
+## Dart General Guidelines
+
+### Basic Principles
+
+- Use English for all code and documentation.
+- Always declare the type of each variable and function (parameters and return value).
+- variables use name that help us understand how they are used 
+- You have read Martin fowler - Refactoring book
+- Avoid using type any
+- Create necessary types
+- Don't leave blank lines within a function
+- One export per file
+- Prefer super contructor
+
+### Nomenclature
+
+- Use PascalCase for classes.
+- Use camelCase for variables, functions, and methods.
+- Use underscores_case for file and directory names.
+- Avoid magic numbers and define constants.
+- Start each function with a verb.
+- Use verbs for boolean variables. Example: isLoading, hasError, canDelete, etc.
+- Use complete words instead of abbreviations and correct spelling.
+- Except for standard abbreviations like API, URL, etc.
+- Except for well-known abbreviations:
+  - i, j for loops
+  - err for errors
+  - ctx for contexts
+- req, res, next for middleware function parameters
+- Prefer noun for class names 
+- Prefer verb for methods
+
+### Import
+- always use package import even for our project files
+Ex: import 'package:apparence_kit/core/data/entities/upload_result.dart';
+- Comply to the always_use_package_imports rule
+- Our package is named apparence_kit
+- DO avoid relative imports for files in lib/
+
+## ApparenceKit architecture
+ApparenceKit architecture is based on 3 main layers
+
+### Folder structure 
+
+Here is a brief overview of the folder structure:
+
+lib
+├── core
+│   ├── bottom_menu // bottom menu module 
+│   ├── data 
+│   │   ├── api // httpclient and api extensions + core api (if an api is used by multiple modules we put it here)
+│   │   ├── entities // function to help you create entities from json etc...
+│   │   └── models 
+│   ├── guards // guards are used to protect routes
+│   ├── initializer // app initializer 
+│   │   └── models
+│   ├── rating // module that can be used by other modules
+│   ├── security // security module (store user token, etc)
+│   ├── shared_preferences // shared preferences module (store user preferences...)
+│   ├── states // contains all the global states (user states)
+│   │   └── models // models used by states
+│   └── widgets
+└── modules
+    └── module_1
+        ├── api // a module can have its own api classes
+        │   └── entities // entities returned by api
+        ├── domain // domain models returned by repositories
+        ├── providers // UI notifier (like a presenter) returns the page state
+        │   └── models // models for our page state
+        ├── repositories // repositories are used to get domain from api
+        └── ui // pages, widgets, components, etc...using our page state
+            ├── component // a component use a provider and domain  
+            └── widgets // a widget is dumb and only using Flutter
+
+
+### 1 - The data layer (API layer)
+This layer is responsible for fetching data from any source.
+It is also responsible for parsing and serialization.
+
+Depending on if you are using a server, Firebase or Supabase you will have different classes in this layer.
+This is also where we will request data to the secured storage or any other native plugin.
+
+This is the only layer that isn't in our unit tests.
+
+Example of API using Supabase 
+
+```dart
+final userApiProvider = Provider<UserApi>(
+  (ref) => UserApi(
+    client: Supabase.instance.client,
+    storageApi: ref.read(storageApiProvider),
+  ),
+);
+
+class UserApi {
+  final SupabaseClient _client;
+  final StorageApi _storageApi;
+
+  UserApi({
+    required SupabaseClient client,
+    required StorageApi storageApi,
+  }) : _client = client,_storageApi = storageApi;
+
+  Future<UserEntity?> get(String id) async {
+    try {
+      final res = await _client
+          .from('users') //
+          .select()
+          .eq('id', id);
+      if (res.isEmpty) {
+        return null;
+      }
+      return UserEntity.fromJson(res.first);
+    } catch (e, stacktrace) {
+      throw ApiError(
+        code: 0,
+        message: '$e: $stacktrace',
+      );
+    }
+  }
+}
+```
+- We create a provider to inject UserApi in repositories
+- Only repositories will be able to use Api classes
+- API returns entities
+
+### 2. The domain layer
+- This layer is responsible for the business logic of the app.
+- It is where we will handle the data from the API layer and transform it to be used by the presentation layer. That is the responsibility of the repository classes.
+
+```dart
+final userRepositoryProvider = Provider<UserRepository>(
+  (ref) => UserRepository(
+    userApi: ref.read(userApiProvider),
+    subscriptionRepository: ref.read(subscriptionRepositoryProvider),
+  ),
+);
+
+class UserRepository {
+  final UserApi _userApi;
+  final SubscriptionRepository _subscriptionRepository;
+
+
+  UserRepository({
+    required UserApi userApi,
+  }) : _userApi = userApi;
+
+  Future<User?> get(String id) async {
+    final userEntity = await _userApi.get(id);
+    if (userEntity == null) {
+      return null;
+    }
+    return User.fromEntity(userEntity);
+  }
+}
+```
+
+- We transformed UserEntity to a User
+- User can contains more than just UserEntity informations (We could also have loaded subscription, user role... )
+
+Example of data model
+
+```dart
+import 'package:apparence_kit/core/data/entities/user_entity.dart';
+import 'package:apparence_kit/core/data/models/subscription.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:logger/logger.dart';
+
+part 'user.freezed.dart';
+
+@freezed
+sealed class User with _$User {
+  const factory User.authenticated({
+    required Email email,
+    Name? name,
+    String? id,
+    DateTime? creationDate,
+    DateTime? lastUpdateDate,
+    Avatar? avatar,
+    required bool onboarded,
+    Subscription? subscription,
+  }) = AuthenticatedUserData;
+
+  const factory User.anonymous({
+    String? id,
+    bool? onboarded,
+    Subscription? subscription,
+    DateTime? creationDate,
+    DateTime? lastUpdateDate,
+  }) = AnonymousUserData;
+
+  const factory User.loading() = LoadingUserData;
+
+  const User._();
+}
+```
+
+- it use @freezed for immutability and union type
+- Note that Email isn't a String. We prefer create a type for this for our domain. SO for example we can check that an Email is valid "new Email.from('myemail@test.com')" throws if provided email isn't valid
+
+
+### 3. The presentation layer (VIEW)
+- This is the last layer that will display the data to the user.
+- It relies on repositories to get the data or do any other actions.
+- our view will listen to an immutable state object from the Riverpod notifier
+- view can trigger actions that will update the state object
+
+Example of page notifier 
+
+```dart
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:apparence_kit/modules/feedbacks/models/feedback_state.dart';
+
+part 'feedback_page_notifier.g.dart';
+
+@Riverpod(keepAlive: false)
+class FeedbackPageNotifier extends _$FeedbackPageNotifier {
+  @override
+  Future<FeebackPageState> build() async {
+    final featureRequestRepository = ref.read(featureRequestRepositoryProvider);
+    final userState = ref.read(userStateNotifierProvider);
+
+    final userVotes = await featureRequestRepository.getUserVotes(userState.user.idOrThrow);
+    final features = await featureRequestRepository.getActiveFeatureRequests();
+    features.sort((a, b) => b.votes.compareTo(a.votes));
+
+    return FeebackPageState(
+      featureRequests: features,
+      userVotes: userVotes,
+    );
+  }
+}
+```
+- The notifier state is using freezed for immutability 
+- it will be located in module folder then > providers 
+
+We will then use this notifier within our page using "ref.watch(feedbackPageNotifierProvider);"
+
+Here is an example of page
+```dart
+import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
+import 'package:apparence_kit/core/widgets/responsive_layout.dart';
+import 'package:apparence_kit/i18n/translations.g.dart';
+import 'package:apparence_kit/modules/feedbacks/providers/feedback_page_notifier.dart';
+import 'package:apparence_kit/modules/feedbacks/ui/widgets/add_feature_button.dart';
+import 'package:apparence_kit/modules/feedbacks/ui/widgets/feature_card.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+class FeedbackPage extends ConsumerWidget {
+  const FeedbackPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final state = ref.watch(feedbackPageNotifierProvider);
+    final translations = Translations.of(context).feature_requests;
+
+    return Scaffold(
+      backgroundColor: context.colors.background,
+      body: SafeArea(
+        child: LargeLayoutContainer(
+          child: CustomScrollView(
+            slivers: [
+              state.map(
+                data: (data) {
+                  if (data.value.featureRequests.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+                        child: Text(
+                          "No feature requests yet",
+                          textAlign: TextAlign.center,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            fontWeight: FontWeight.w300,
+                            color: context.colors.onBackground
+                                .withValues(alpha: 0.6),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
+                  return SliverList.separated(
+                    itemBuilder: (context, index) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                      child: FeatureCard(
+                        title: data.value.featureRequests[index].title,
+                        description:
+                            data.value.featureRequests[index].description,
+                        votes: data.value.featureRequests[index].votes,
+                        onVote: () {
+                          ref
+                              .read(feedbackPageNotifierProvider.notifier)
+                              .vote(data.value.featureRequests[index]);
+                        },
+                        voted: data.value.hasVoted(
+                          data.value.featureRequests[index],
+                        ),
+                      ),
+                    ),
+                    separatorBuilder: (context, index) => const SizedBox(
+                      height: 12,
+                    ),
+                    itemCount: data.value.featureRequests.length,
+                  );
+                },
+                error: (error) => SliverFillRemaining(
+                  child: Center(
+                    child: Text(error.error.toString()),
+                  ),
+                ),
+                loading: (data) {
+                  return const SliverFillRemaining(
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                },
+              ),
+              const SliverToBoxAdapter(
+                child: SizedBox(height: 100),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+- for each new files don't forget to add required imports
+
+

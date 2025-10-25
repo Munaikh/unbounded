@@ -1,0 +1,20 @@
+name: app
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+        - name: Setup Flutter
+          uses: subosito/flutter-action@v2
+          with:
+            channel: 'stable'
+        - name: Run Dart Analyzer
+          run: flutter analyze lib test --no-fatal-infos --no-fatal-warnings
+        - name: Run tests 
+          run: flutter test

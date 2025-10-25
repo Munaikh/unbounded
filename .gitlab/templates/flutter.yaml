@@ -1,0 +1,163 @@
+###########
+## SETUP ##
+###########
+.setup:
+  tags:
+    - macos
+  except:
+    - tags
+  script:
+    - flutter channel stable
+    - flutter upgrade
+    - flutter pub global activate cider
+    - flutter clean
+    - pod repo update
+    - export LC_ALL=fr_FR.UTF-8
+    - export LANG=fr_FR.UTF-8
+    - export APP_PATH=$(pwd)
+  artifacts:
+    reports:
+      dotenv:
+        - lc_all.env
+        - lang.env
+        - app_path.env
+
+
+.build-android-release:
+  tags:
+    - macos
+  variables:
+    FLAVOR: ""
+    PATH_TO_RUNNER: ""
+    ADDITIONAL_OPTIONS: ""
+  only:
+    - release
+  script:
+    - flutter pub get
+    - flutter build apk --flavor $FLAVOR --release -t $PATH_TO_RUNNER $ADDITIONAL_OPTIONS
+    - flutter build appbundle --flavor $FLAVOR --release -t $PATH_TO_RUNNER $ADDITIONAL_OPTIONS
+  artifacts:
+    paths:
+      - build/app/outputs/flutter-apk/app-$FLAVOR-release.apk
+      - build/app/outputs/bundle/${FLAVOR}Release/app-$FLAVOR-release.aab
+
+
+.build-android-profile:
+  tags:
+    - macos
+  variables:
+    FLAVOR: ""
+    PATH_TO_RUNNER: ""
+    ADDITIONAL_OPTIONS: ""
+  only:
+    - master
+  script:
+    - flutter pub get
+    - if [[ $FLAVOR == "" ]]; then flutter build apk -t $PATH_TO_RUNNER $ADDITIONAL_OPTIONS; else flutter build apk --flavor $FLAVOR -t $PATH_TO_RUNNER $ADDITIONAL_OPTIONS; fi
+    - if [[ $FLAVOR == "" ]]; then flutter build appbundle --profile -t $PATH_TO_RUNNER $ADDITIONAL_OPTIONS; else flutter build appbundle --profile --flavor $FLAVOR -t $PATH_TO_RUNNER $ADDITIONAL_OPTIONS; fi
+  artifacts:
+    paths:
+      - build/app/outputs/flutter-apk
+      - build/app/outputs/bundle/${FLAVOR}Profile/app-$FLAVOR-profile.aab
+
+.build-ios-ipa:
+  tags:
+    - macos
+  only:
+    - master
+    - main
+  variables:
+    FLAVOR: ""
+    PATH_TO_RUNNER: ""
+    METHOD: "ad-hoc" # ["ad-hoc", "app-store", "development", "enterprise"]
+    ADDITIONAL_OPTIONS: ""
+  script:
+    - cd ios
+    - pod repo update
+    - cd ..
+    - flutter pub get
+    - if [[ $FLAVOR == "" ]]; then flutter build ipa -t $PATH_TO_RUNNER $ADDITIONAL_OPTIONS; else flutter build ipa --flavor $FLAVOR -t $PATH_TO_RUNNER $ADDITIONAL_OPTIONS; fi
+    # rename ipa file
+    - mv build/ios/ipa/*.ipa build/ios/ipa/app-release.ipa
+  artifacts:
+    paths:
+      - build/ios/ipa/app.ipa
+
+.build-ios-auto:
+  tags:
+    - macos
+  only:
+    - release
+  variables:
+    FLAVOR: ""
+    PATH_TO_RUNNER: ""
+    EXPORT_OPTIONS_PLIST: "../scripts/exportOptions.plist"
+    ADDITIONAL_OPTIONS: ""
+  script:
+    - flutter clean
+    - cd ios
+    - pod repo update
+    - cd ..
+    - flutter build ios -t $PATH_TO_RUNNER --flavor $FLAVOR --release $ADDITIONAL_OPTIONS
+    - cd ios
+    - xcodebuild -quiet -workspace Runner.xcworkspace -scheme $FLAVOR archive -archivePath Runner.xcarchive -allowProvisioningUpdates -destination generic/platform=iOS
+    - xcodebuild -quiet -exportArchive -archivePath Runner.xcarchive -exportOptionsPlist $EXPORT_OPTIONS_PLIST -exportPath ../scripts -allowProvisioningUpdates
+    - cd ../scripts
+    - mv *.ipa app-$FLAVOR.ipa
+  artifacts:
+    paths:
+      - scripts/app-$FLAVOR.ipa
+
+.tests-stable:
+  tags:
+    - macos
+  stage: test
+  image: "cirrusci/flutter:stable"
+  before_script:
+    - flutter pub global activate junitreport
+    - export PATH="$PATH":"$HOME/.pub-cache/bin"
+  script:
+    - flutter test --machine --coverage | tojunit -o report.xml
+    - lcov --summary coverage/lcov.info
+    - genhtml coverage/lcov.info --output=coverage
+  coverage: '/lines\.*: \d+\.\d+\%/'
+  artifacts:
+    name: coverage
+    paths:
+      - $CI_PROJECT_DIR/coverage
+    reports:
+      junit: report.xml
+
+##############################################
+## YOU MUST INSTALL CIDER BEFORE USING THIS ##
+##############################################
+
+.bump-build-version:
+  variables:
+    BRANCH: "master"
+  tags:
+    - macos
+  script:
+    - export PATH="$PATH":"$HOME/.pub-cache/bin"
+    # git prepare
+    - git checkout -B $BRANCH
+    - git remote set-url origin "$(echo $CI_REPOSITORY_URL | perl -pe 's#.*@(.+?(\:\d+)?)/#git@\1:#')"
+    - git branch --set-upstream-to=origin/$BRANCH $BRANCH
+    # bump project build version
+    - cider bump build
+    - export APP_PROJECT_VERSION=$(cider version)
+    - git add pubspec.yaml
+    - git commit -m "🔖 Bump build version"
+    - git tag -a "${APP_PROJECT_VERSION}-staging" -m "Version created by Gitlab CI build."
+    - git push origin HEAD:$BRANCH --follow-tags -o ci.skip
+    - git pull
+
+.read-build-version:
+  tags:
+    - macos
+  script:
+    - export APP_PROJECT_VERSION=$(cider version)
+    - echo "APP_PROJECT_VERSION=$APP_PROJECT_VERSION" >> app_project_version.env
+  artifacts:
+    reports:
+      dotenv: app_project_version.env

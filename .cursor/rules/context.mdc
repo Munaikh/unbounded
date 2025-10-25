@@ -1,0 +1,20 @@
+---
+description: global app context
+globs: 
+alwaysApply: false
+---
+## Project description
+
+## Expected workflow
+- review feature requirements
+- plan implementation
+- update schema if needed 
+- implement core functionality
+
+Please think out loud and provide 
+- Overview of completed work
+- Rationale for decision
+- next steps checklist
+
+You must ensure 
+- when implementing new feature it doesn't break existing feature

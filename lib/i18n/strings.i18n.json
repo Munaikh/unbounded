@@ -1,0 +1,130 @@
+{
+    "home": {
+        "title": "ApparenceKit example"
+    },
+    "rate_popup": {
+        "title": "Would you have 15s to rate us?",
+        "description": "It's fast and very helpful! Thanks a lot!",
+        "cancel_button": "Maybe later",
+        "rate_button": "Yes, with pleasure!"
+    },
+    "premium": {
+        "title_1": "Unlock full access",
+        "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+        "feature_1": "Lorem ipsum dolor sit ame lorem",
+        "feature_2": "Lorem ipsum dolor sit ame lorem",
+        "feature_3": "Lorem ipsum dolor sit ame lorem",
+        "duration_weekly": "Weak",
+        "duration_annual": "Year",
+        "duration_annual_description": "Save 50%",
+        "duration_monthly": "Month",
+        "duration_monthly_description": "Cancel anytime",
+        "duration_lifetime": "Lifetime",
+        "duration_lifetime_description": "One time payment",
+        "restore_action": "Restore my subscription",
+        "payment_cancel_reassurance": "Easy 1-click cancel, always",
+        "payment_action": "Start free trial",
+        "payment_action_trial": "7-day free trial, then $money"
+    },
+    "paywallWithSwitch": {
+        "withTrial": {
+            "title": "Try Free for $days days",
+            "btnAction": "Try for free",
+            "details": "$days days free, then $price",
+            "trial_switch_title": "$days-day free trial"
+        },
+        "noTrial": {
+            "title": "Enjoy Your Premium Experience",
+            "btnAction": "Continue",
+            "trial_switch_title": "Not sure yet?",
+            "trial_switch_subtitle": "Enable free trial"
+        },
+        "features": [
+            "Lorem feature 1",
+            "Lorem feature 2",
+            "Lorem feature 3",
+            "Cancel anytime"
+        ]
+    },
+    "request_notification_permission": {
+        "title": "Don't miss anything",
+        "description": "Allow us to send you notifications to stay up to date with the latest news...",
+        "continue_button": "Allow notifications",
+        "skip_button": "Maybe later"
+    },
+    "onboarding": {
+        "feature_1": {
+            "title": "Subscriptions module",
+            "description": "Manage subscriptions with premade paywalls",
+            "action": "Continue"
+        },
+        "feature_2": {
+            "title": "Authentication module",
+            "description": "Manage authentication with premade screens for (login, register, forgot password, etc.)",
+            "action": "Continue"
+        },
+        "feature_3": {
+            "title": "Notifications module",
+            "description": "Receive push notifications, show in-app notifications, manage permissions, notifications list with status...",
+            "action": "Continue"
+        },
+        "ageQuestion": {
+            "title": "What is your age?",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "options(map)": {
+                "age18_30": "[18 - 30] years old",
+                "age31_40": "[31 - 40] years old",
+                "age41_50": "[41 - 50] years old",
+                "age51_60": "50 years and above",
+                "none": "I prefer not to answer"
+            },
+            "action": "Continue"
+        },
+        "genderQuestion": {
+            "title": "What is your gender?",
+            "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+            "options(map)": {
+                "male": "Male",
+                "female": "Female",
+                "none": "I prefer not to answer"
+            },
+            "action": "Continue"
+        },
+        "notifications": {
+            "title": "Allow notifications",
+            "description": "We will only send you important notifications",
+            "continue_button": "Allow notifications",
+            "skip_button": "Maybe later"
+        },
+        
+        "loading": {
+            "title": "Creating your profile",
+            "subtitle": "Wait a few seconds"
+        }
+    },
+    "feature_requests": {
+      "title": "Your opinion matters!",
+      "description": "Vote or suggest new features.\r\nWe listen everyone of you to create the best possible app.",
+      "vote_success": {
+        "title": "Thank you!",
+        "description": "Your vote has been taken into account"
+      },
+      "vote_error": {
+        "title": "Error",
+        "description": "You already voted for a feature"
+      },
+      "add_feature": {
+        "title": "Suggest a feature",
+        "description": "What feature would you like to see in the app?",
+        "save_button": "Send",
+        "title_label": "Feature title",
+        "title_hint": "Enter a short descriptive title",
+        "description_label": "Description",
+        "description_hint": "Describe the feature or the improvement you would like to see in the app",
+        "toast_success": {
+          "title": "Thank you!",
+          "description": "We will review your suggestion"
+        }
+      }
+    }
+}
