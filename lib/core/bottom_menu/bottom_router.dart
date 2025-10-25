@@ -39,8 +39,8 @@ List<BartMenuRoute> subRoutes() {
       path: '404',
       builder: (context, isActive) => BottomMenuItem(
         isSelected: isActive,
-        icon: Ionicons.people,
-        iconOutline: Ionicons.people_outline,
+        icon: Ionicons.game_controller,
+        iconOutline: Ionicons.game_controller_outline,
         label: "Society",
       ),
       pageBuilder: (_, _, settings) => const PageNotFound(),
