@@ -7,7 +7,7 @@ class LargeCard extends StatelessWidget {
   final String title;
   final String description;
   final String distance;
-  final String price;
+  final int price;
   final int minGroupSize;
   final int maxGroupSize;
   const LargeCard({
@@ -22,97 +22,84 @@ class LargeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 230,
-      child: ListView.builder(
-        shrinkWrap: true,
-        scrollDirection: Axis.horizontal,
-        itemCount: 7,
-        itemBuilder: (context, index) {
-          return PressableScale(
-            child: Container(
-              width: (MediaQuery.of(context).size.width) * .7,
-              margin: const EdgeInsets.only(right: 16),
-    
-              decoration: ShapeDecoration(
-                shape: RoundedSuperellipseBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                color: context.colors.surface,
+    return PressableScale(
+      child: Container(
+        width: (MediaQuery.of(context).size.width) * .7,
+        margin: const EdgeInsets.only(right: 16),
+        decoration: ShapeDecoration(
+          shape: RoundedSuperellipseBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          color: context.colors.surface,
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: Column(
+          children: [
+            Expanded(
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                width: double.infinity,
               ),
-              clipBehavior: Clip.hardEdge,
+            ),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                    child: Image.network(
-                      imageUrl,
-                      fit: BoxFit.cover,
-                      width: double.infinity,
+                  Text(title, style: context.textTheme.titleMedium),
+                  const SizedBox(height: 4),
+                  Text(
+                    description,
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: context.colors.onSurface.withValues(alpha: .6),
                     ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(title, style: context.textTheme.titleMedium),
-                        const SizedBox(height: 4),
-                        Text(
-                          description,
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colors.onSurface.withValues(
-                              alpha: .6,
-                            ),
-                          ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 16,
+                        color: context.colors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        distance,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.colors.primary,
                         ),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              size: 16,
-                              color: context.colors.primary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              distance,
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colors.primary,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Text(
-                              '£ $price',
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colors.primary,
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Icon(
-                              Icons.group,
-                              size: 16,
-                              color: context.colors.primary,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '$minGroupSize-$maxGroupSize',
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colors.primary,
-                              ),
-                            ),
-                          ],
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        '£ $price',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.colors.primary,
                         ),
-                      ],
-                    ),
+                      ),
+                      const SizedBox(width: 16),
+                      Icon(
+                        Icons.group,
+                        size: 16,
+                        color: context.colors.primary,
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        '$minGroupSize-$maxGroupSize',
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.colors.primary,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
