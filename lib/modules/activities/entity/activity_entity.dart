@@ -1,7 +1,7 @@
 
 
-import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:flutter/foundation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'activity_entity.freezed.dart';
 part 'activity_entity.g.dart';
