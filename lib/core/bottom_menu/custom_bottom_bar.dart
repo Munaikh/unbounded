@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 class CustomBottomBar extends BartBottomBarFactory {
   final double blur = 15;
   final double opacity = 0.7;
-  final double borderRadius = 24;
+  final double borderRadius = 28;
   final double padding = 8;
 
   BottomMenuItem getBottomMenuItem(
@@ -30,47 +30,40 @@ class CustomBottomBar extends BartBottomBarFactory {
     int currentIndex,
   ) {
     return Container(
-      decoration: BoxDecoration(
-        boxShadow: [
+      padding: EdgeInsets.all(padding),
+      decoration: ShapeDecoration(
+         shadows: [
           BoxShadow(
             offset: const Offset(0, -1),
             color: context.colors.shadow.withCustomOpacity(0.1),
-            blurRadius: 10,
+            blurRadius: 100,
             spreadRadius: 2,
           ),
         ],
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.only(
-          topLeft: Radius.circular(borderRadius),
-          topRight: Radius.circular(borderRadius),
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
         ),
-        child: Container(
-          padding: EdgeInsets.all(padding),
-          decoration: BoxDecoration(
-            color: context.colors.surface,
-          ),
-          child: SafeArea(
-            top: false,
-            child: Row(
-              children: [
-                for (var i = 0; i < routes.length; i++)
-                  Expanded(
-                    child: PressableScale(
-                      scaleTo: 0.95,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.translucent,
-                        onTap: () => onTap(i),
-                        child: routes[i].iconBuilder?.call(
-                          context,
-                          i == currentIndex,
-                        ) ?? const SizedBox.shrink(),
-                      ),
-                    ),
+        color: context.colors.surface,
+      ),
+      child: SafeArea(
+        // top: false,
+        child: Row(
+          children: [
+            for (var i = 0; i < routes.length; i++)
+              Expanded(
+                child: PressableScale(
+                  scaleTo: 0.95,
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.translucent,
+                    onTap: () => onTap(i),
+                    child: routes[i].iconBuilder?.call(
+                      context,
+                      i == currentIndex,
+                    ) ?? const SizedBox.shrink(),
                   ),
-              ],
-            ),
-          ),
+                ),
+              ),
+          ],
         ),
       ),
     );

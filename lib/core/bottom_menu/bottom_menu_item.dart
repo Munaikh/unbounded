@@ -24,6 +24,7 @@ class BottomMenuItem extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          const SizedBox(height: 8),
           Icon(
             isSelected ? icon : iconOutline,
             color:
