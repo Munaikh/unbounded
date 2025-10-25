@@ -13,6 +13,7 @@ abstract class ActivityEntity with _$ActivityEntity {
     required int id,
     required DateTime createdAt,
     required String name,
+    String? imageUrl,
     String? description,
     int? cost,
     String? website,
