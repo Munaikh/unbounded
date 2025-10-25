@@ -28,14 +28,14 @@ class CheckedReassurance extends StatelessWidget {
           color: const Color(0xFFF8FFF5),
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
-            color: context.colors.grey3,
+            color: context.colors.neutral300,
           ),
         ),
         child: Text(
           text,
           textAlign: TextAlign.left,
           style: context.textTheme.bodyLarge?.copyWith(
-            color: context.colors.grey3,
+            color: context.colors.neutral300,
             fontWeight: FontWeight.w900,
           ),
         ),

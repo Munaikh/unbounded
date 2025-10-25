@@ -288,7 +288,7 @@ class _SelectableRowTileState extends State<SelectableRowTile>
                     child: Text(
                       widget.subtitle!,
                       style: context.textTheme.bodySmall?.copyWith(
-                        color: context.colors.grey2,
+                        color: context.colors.neutral300,
                       ),
                     ),
                   ),
@@ -354,7 +354,7 @@ class RoundRadioBox extends StatelessWidget {
   // ignore: avoid_unused_constructor_parameters
   factory RoundRadioBox.unselected(BuildContext context) {
     return RoundRadioBox(
-      bgColor: context.colors.grey1,
+      bgColor: context.colors.neutral300,
       borderColor: context.colors.surface.withValues(alpha:.1),
     );
   }
@@ -381,7 +381,7 @@ class RoundRadioBox extends StatelessWidget {
                   scale: iconSize,
                   child: Icon(
                     icon,
-                    color: context.colors.grey2,
+                    color: context.colors.neutral300,
                     size: 21,
                   ),
                 ),

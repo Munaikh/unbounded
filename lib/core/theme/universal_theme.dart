@@ -61,7 +61,7 @@ class UniversalThemeFactory extends ApparenceKitThemeDataFactory {
           color: colors.primary,
         ),
         unselectedIconTheme: IconThemeData(
-          color: colors.grey2,
+          color: colors.neutral300,
         ),
         selectedLabelTextStyle: textTheme.primary.copyWith(
           color: colors.primary,
@@ -109,7 +109,7 @@ class UniversalThemeFactory extends ApparenceKitThemeDataFactory {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.0),
           borderSide: BorderSide(
-            color: colors.grey1.withValues(alpha:.15),
+            color: colors.neutral300.withValues(alpha:.15),
           ),
         ),
         focusedBorder: OutlineInputBorder(
@@ -127,17 +127,17 @@ class UniversalThemeFactory extends ApparenceKitThemeDataFactory {
         ),
         filled: true,
         hintStyle: textTheme.primary.copyWith(
-          color: colors.grey2,
+          color: colors.neutral300,
           fontSize: 16,
           fontWeight: FontWeight.w300,
         ),
         labelStyle: textTheme.primary.copyWith(
-          color: colors.grey2,
+          color: colors.neutral300,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(5.0),
           borderSide: BorderSide(
-            color: colors.grey2,
+            color: colors.neutral300,
           ),
         ),
       );

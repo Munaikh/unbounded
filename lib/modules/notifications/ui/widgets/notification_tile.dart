@@ -52,7 +52,7 @@ class NotificationTile extends StatefulWidget {
         description: description,
         titleColor: context.colors.onPrimary,
         descriptionColor: context.colors.onPrimary,
-        dateColor: context.colors.grey1,
+        dateColor: context.colors.neutral300,
         onTap: onTap,
       );
 
@@ -74,7 +74,7 @@ class NotificationTile extends StatefulWidget {
         description: description,
         titleColor: context.colors.onSurface,
         descriptionColor: context.colors.onSurface,
-        dateColor: context.colors.grey3,
+        dateColor: context.colors.neutral300,
         onTap: onTap,
       );
 

@@ -233,7 +233,7 @@ class InitializationErrorPage extends StatelessWidget {
             Text(
               'Check your internet connection and start again',
               style: context.textTheme.bodyLarge?.copyWith(
-                color: context.colors.grey3,
+                color: context.colors.neutral300,
               ),
             ),
             if (kDebugMode) 
