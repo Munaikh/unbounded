@@ -181,6 +181,9 @@ class ActivityDetailPage extends ConsumerWidget {
                 ),
                 ),
               ),
+              SliverToBoxAdapter(
+                child: const SizedBox(height: 16),
+              ),
             ],
           );
         },
