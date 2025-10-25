@@ -8,14 +8,16 @@ class LargeCard extends StatelessWidget {
   final String description;
   final String distance;
   final String price;
-  final String groupSize;
+  final int minGroupSize;
+  final int maxGroupSize;
   const LargeCard({
     required this.imageUrl,
     required this.title,
     required this.description,
     required this.distance,
     required this.price,
-    required this.groupSize,
+    required this.minGroupSize,
+    required this.maxGroupSize,
   });
 
   @override
@@ -96,7 +98,7 @@ class LargeCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              groupSize,
+                              '$minGroupSize-$maxGroupSize',
                               style: context.textTheme.bodyMedium?.copyWith(
                                 color: context.colors.primary,
                               ),
