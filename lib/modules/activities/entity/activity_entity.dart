@@ -1,11 +1,9 @@
-
-
+import 'package:apparence_kit/modules/activities/entity/tag_entity.dart';
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'activity_entity.freezed.dart';
 part 'activity_entity.g.dart';
-
 
 @freezed
 abstract class ActivityEntity with _$ActivityEntity {
@@ -21,6 +19,7 @@ abstract class ActivityEntity with _$ActivityEntity {
     String? location,
     int? minGroupSize,
     int? maxGroupSize,
+    @Default([]) List<TagEntity> tags,
   }) = _ActivityEntity;
 
   factory ActivityEntity.fromJson(Map<String, dynamic> json) => _$ActivityEntityFromJson(json);

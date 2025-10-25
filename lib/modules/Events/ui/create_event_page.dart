@@ -1,6 +1,7 @@
 import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
+import 'package:apparence_kit/core/widgets/toast.dart';
 import 'package:apparence_kit/modules/events/api/events_api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -460,11 +461,11 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   Future<void> _createEvent() async {
     // Validate inputs
     if (_titleController.text.trim().isEmpty) {
-      _showError('Please enter a title');
+      ref.read(toastProvider).error(title: 'Error', text: 'Please enter a title');
       return;
     }
     if (_descriptionController.text.trim().isEmpty) {
-      _showError('Please enter a description');
+      ref.read(toastProvider).error(title: 'Error', text: 'Please enter a description');
       return;
     }
 
@@ -485,31 +486,14 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
 
       if (mounted) {
         // Show success message
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Event created successfully!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        // Navigate back
-        context.pop();
+        ref.read(toastProvider).success(title: 'Event created successfully!', text: 'Event created successfully!');
       }
     } catch (e) {
-      if (mounted) {
-        _showError('Failed to create event: $e');
-      }
+      ref.read(toastProvider).error(title: 'Error', text: 'Failed to create event: $e');
     } finally {
-      if (mounted) {
-        setState(() {
-          _isCreating = false;
-        });
-      }
+      setState(() {
+        _isCreating = false;
+      });
     }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
   }
 }

@@ -1,16 +1,21 @@
+import 'package:apparence_kit/core/shared_preferences/models/user_preferences.dart';
+import 'package:apparence_kit/core/shared_preferences/user_preferences_provider.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
+import 'package:apparence_kit/core/widgets/toast.dart';
+import 'package:apparence_kit/modules/activities/providers/filtered_activities_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-class PersonalizationWizard extends StatefulWidget {
+class PersonalizationWizard extends ConsumerStatefulWidget {
   const PersonalizationWizard({super.key});
 
   @override
-  State<PersonalizationWizard> createState() => _PersonalizationWizardState();
+  ConsumerState<PersonalizationWizard> createState() => _PersonalizationWizardState();
 }
 
-class _PersonalizationWizardState extends State<PersonalizationWizard> {
+class _PersonalizationWizardState extends ConsumerState<PersonalizationWizard> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
@@ -41,8 +46,22 @@ class _PersonalizationWizardState extends State<PersonalizationWizard> {
     context.pop();
   }
 
-  void _finish() {
-    // Just show a snackbar with the selections
+  Future<void> _finish() async {
+    // Save preferences to shared preferences
+    final preferences = UserPreferences(
+      minPeople: _minPeople,
+      maxPeople: _maxPeople,
+      budgetPerPerson: _budgetPerPerson,
+      activityType: _activityType,
+      surpriseMe: _surpriseMe,
+    );
+
+    await ref.read(userPreferencesProvider.notifier).setPreferences(preferences);
+
+    // Refresh the filtered activities provider to apply new filters
+    ref.invalidate(filteredActivitiesProvider);
+
+    // Show confirmation message
     final selections = <String>[];
     if (_minPeople != null && _maxPeople != null) {
       selections.add('Group: $_minPeople-$_maxPeople people');
@@ -55,13 +74,14 @@ class _PersonalizationWizardState extends State<PersonalizationWizard> {
     }
 
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Preferences: ${selections.join(', ')}'),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-      context.pop();
+      ref.read(toastProvider).success(title: 'Preferences saved', text: 'Preferences saved: ${selections.join(', ')}');
+      // ScaffoldMessenger.of(context).showSnackBar(
+      //   SnackBar(
+      //     content: Text('Preferences saved: ${selections.join(', ')}'),
+      //     duration: const Duration(seconds: 3),
+      //   ),
+      // );
+      // context.pop();
     }
   }
 

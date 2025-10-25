@@ -111,16 +111,35 @@ void showErrorToast({
     return;
   }
   Flushbar(
+    // flushbarPosition: FlushbarPosition.TOP,
+    // title: title,
+    // message: text,
+    // titleSize: 21,
+    // messageSize: 16,
+    // duration: duration,
+    // backgroundColor: Colors.redAccent,
+    // icon: const Icon(
+    //   Icons.error,
+    //   color: Colors.white,
+    // ),
     flushbarPosition: FlushbarPosition.TOP,
     title: title,
     message: text,
-    titleSize: 21,
-    messageSize: 16,
+    titleSize: 24,
+    messageSize: 14,
     duration: duration,
-    backgroundColor: Colors.redAccent,
+    barBlur: 8,
+    backgroundColor: Colors.redAccent.withValues(alpha: 0.8),
+    titleColor: Colors.white,
+    messageColor: Colors.white,
+    // leftBarIndicatorColor: Colors.greenAccent,
+    borderRadius: BorderRadius.circular(16),
+    margin: const EdgeInsets.all(16),
+    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
     icon: const Icon(
       Icons.error,
       color: Colors.white,
     ),
+    shouldIconPulse: false,
   ).show(context);
 }

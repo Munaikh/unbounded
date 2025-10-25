@@ -10,13 +10,13 @@ import 'package:ionicons/ionicons.dart';
 List<BartMenuRoute> subRoutes() {
   return [
     BartMenuRoute.bottomBarBuilder(
-      label: "Home",
+      label: "Discover",
       path: 'home',
       builder: (context, isActive) => BottomMenuItem(
         isSelected: isActive,
-        icon: Ionicons.home,
-        iconOutline: Ionicons.home_outline,
-        label: "Home",
+        icon: Ionicons.location,
+        iconOutline: Ionicons.location_outline,
+        label: "Discover",
       ),
       pageBuilder: (_, _, settings) => const HomePage(),
       transitionDuration: bottomBarTransitionDuration,
