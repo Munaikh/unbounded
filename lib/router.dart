@@ -1,8 +1,8 @@
 import 'package:apparence_kit/core/bottom_menu/bottom_menu.dart';
 import 'package:apparence_kit/core/data/api/analytics_api.dart';
-import 'package:apparence_kit/core/guards/authenticated_guard.dart';
 import 'package:apparence_kit/core/guards/user_info_guard.dart';
 import 'package:apparence_kit/core/widgets/page_not_found.dart';
+import 'package:apparence_kit/modules/activities/activity_detail_page.dart';
 import 'package:apparence_kit/modules/authentication/ui/phone_auth_page.dart';
 import 'package:apparence_kit/modules/authentication/ui/recover_password_page.dart';
 import 'package:apparence_kit/modules/authentication/ui/signin_page.dart';
@@ -82,6 +82,18 @@ GoRouter generateRouter({
         name: '404',
         path: '/404',
         builder: (context, state) => const PageNotFound(),
+      ),
+      GoRoute(
+        name: 'activity_detail',
+        path: '/activities/:id',
+        builder: (context, state) {
+          final idParam = state.pathParameters['id'] ?? '';
+          final id = int.tryParse(idParam);
+          if (id == null) {
+            return const PageNotFound();
+          }
+          return ActivityDetailPage(id: id);
+        },
       ),
     ],
   );
