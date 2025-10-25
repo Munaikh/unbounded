@@ -1,7 +1,6 @@
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_renderer/liquid_glass_renderer.dart';
 
 class LargeCard extends StatelessWidget {
   final String imageUrl;
@@ -35,7 +34,7 @@ class LargeCard extends StatelessWidget {
     
               decoration: ShapeDecoration(
                 shape: RoundedSuperellipseBorder(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(30),
                 ),
                 color: context.colors.surface,
               ),
