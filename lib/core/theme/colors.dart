@@ -122,22 +122,22 @@ class ApparenceKitColors extends ThemeExtension<ApparenceKitColors> {
 
   factory ApparenceKitColors.light() => const ApparenceKitColors(
     // Primary colors
-    primary: Color(0xFF5255ED),
+    primary: Color(0xFFEB4335),
     onPrimary: Color(0xFFFFFFFF),
-    primaryContainer: Color(0xFFE0E0FF),
-    onPrimaryContainer: Color(0xFF0A0B5C),
+    primaryContainer: Color(0xFFFFDAD4),
+    onPrimaryContainer: Color(0xFF410000),
 
     // Secondary colors
-    secondary: Color(0xFF6D4EE9),
+    secondary: Color(0xFFEF6C5A),
     onSecondary: Color(0xFFFFFFFF),
-    secondaryContainer: Color(0xFFECE5FF),
-    onSecondaryContainer: Color(0xFF1A0B5C),
+    secondaryContainer: Color(0xFFFFE0DB),
+    onSecondaryContainer: Color(0xFF410000),
 
     // Tertiary colors (accent)
-    tertiary: Color(0xFF8250E8),
-    onTertiary: Color(0xFFFFFFFF),
-    tertiaryContainer: Color(0xFFF0E5FF),
-    onTertiaryContainer: Color(0xFF2B0B5C),
+    tertiary: Color(0xFFFF8A80),
+    onTertiary: Color(0xFF410000),
+    tertiaryContainer: Color(0xFFFFEDEB),
+    onTertiaryContainer: Color(0xFF410000),
 
     // Background colors
     background: Color(0xFFF7F7F7),
@@ -156,7 +156,7 @@ class ApparenceKitColors extends ThemeExtension<ApparenceKitColors> {
     errorContainer: Color(0xFFFFDAD6),
     onErrorContainer: Color(0xFF410002),
 
-    // Neutral colors (replacing grey1, grey2, grey3)
+    // Neutral colors
     neutral100: Color(0xFFE2E2E6),
     neutral200: Color(0xFFC5C5CD),
     neutral300: Color(0xFF9696A0),
@@ -169,41 +169,43 @@ class ApparenceKitColors extends ThemeExtension<ApparenceKitColors> {
     // Inverse colors
     inverseSurface: Color(0xFF303030),
     onInverseSurface: Color(0xFFEFEFEF),
-    inversePrimary: Color(0xFFBDC0FF),
+    inversePrimary: Color(0xFFFFB4A9),
 
-    appLogoContainer: Color(0xFF5255ED),
+    // App logo colors
+    appLogoContainer: Color(0xFFEB4335),
     appLogo: Color(0xFFFFFFFF),
 
     // Success colors
-    success: Color(0xFF28A745), // Bootstrap success green
+    success: Color(0xFF28A745),
     onSuccess: Color(0xFFFFFFFF),
-    successContainer: Color(0xFFD4EDDA), // Lighter green
-    onSuccessContainer: Color(0xFF155724), // Darker green text
+    successContainer: Color(0xFFD4EDDA),
+    onSuccessContainer: Color(0xFF155724),
+
     // Warning colors
-    warning: Color(0xFFFFC107), // Bootstrap warning yellow
-    onWarning: Color(0xFF212529), // Dark text for yellow background
-    warningContainer: Color(0xFFFFF3CD), // Lighter yellow
-    onWarningContainer: Color(0xFF856404), // Darker yellow text
+    warning: Color(0xFFFFC107),
+    onWarning: Color(0xFF212529),
+    warningContainer: Color(0xFFFFF3CD),
+    onWarningContainer: Color(0xFF856404),
   );
 
   factory ApparenceKitColors.dark() => const ApparenceKitColors(
     // Primary colors
-    primary: Color(0xFF5255ED),
+    primary: Color(0xFFEB4335),
     onPrimary: Color(0xFFFFFFFF),
-    primaryContainer: Color(0xFF3C40D0),
-    onPrimaryContainer: Color(0xFFE1E0FF),
+    primaryContainer: Color(0xFF93000A),
+    onPrimaryContainer: Color(0xFFFFDAD4),
 
     // Secondary colors
-    secondary: Color(0xFF9D89FF),
-    onSecondary: Color(0xFF2D1B7A),
-    secondaryContainer: Color(0xFF533BC5),
-    onSecondaryContainer: Color(0xFFECE5FF),
+    secondary: Color(0xFFFF7B66),
+    onSecondary: Color(0xFF410000),
+    secondaryContainer: Color(0xFF93000A),
+    onSecondaryContainer: Color(0xFFFFDAD4),
 
     // Tertiary colors (accent)
-    tertiary: Color(0xFFB99BFF),
-    onTertiary: Color(0xFF361B7A),
-    tertiaryContainer: Color(0xFF6A3BC5),
-    onTertiaryContainer: Color(0xFFF0E5FF),
+    tertiary: Color(0xFFFFB4A9),
+    onTertiary: Color(0xFF410000),
+    tertiaryContainer: Color(0xFF690005),
+    onTertiaryContainer: Color(0xFFFFDAD4),
 
     // Background colors
     background: Color(0xFF121212),
@@ -222,7 +224,7 @@ class ApparenceKitColors extends ThemeExtension<ApparenceKitColors> {
     errorContainer: Color(0xFFFFDAD6),
     onErrorContainer: Color(0xFF410002),
 
-    // Neutral colors (replacing grey1, grey2, grey3)
+    // Neutral colors
     neutral100: Color(0xFF3A3A40),
     neutral200: Color(0xFF5C5C65),
     neutral300: Color(0xFF7E7E8C),
@@ -235,22 +237,23 @@ class ApparenceKitColors extends ThemeExtension<ApparenceKitColors> {
     // Inverse colors
     inverseSurface: Color(0xFFE6E6E6),
     onInverseSurface: Color(0xFF1A1A1A),
-    inversePrimary: Color(0xFF4145C9),
+    inversePrimary: Color(0xFFFFB4A9),
 
     // App logo colors
     appLogoContainer: Color(0xFFFFFFFF),
-    appLogo: Color(0xFF5255ED),
+    appLogo: Color(0xFFEB4335),
 
     // Success colors
-    success: Color(0xFF2AAA8A), // Seafoam Green, bit lighter for dark bg
+    success: Color(0xFF2AAA8A),
     onSuccess: Color(0xFFFFFFFF),
-    successContainer: Color(0xFF1E4620), // Darker green container
-    onSuccessContainer: Color(0xFFD4EDDA), // Lighter green text
+    successContainer: Color(0xFF1E4620),
+    onSuccessContainer: Color(0xFFD4EDDA),
+
     // Warning colors
-    warning: Color(0xFFFFD700), // Gold, lighter for dark bg
+    warning: Color(0xFFFFD700),
     onWarning: Color(0xFF212529),
-    warningContainer: Color(0xFF4D3800), // Darker yellow container
-    onWarningContainer: Color(0xFFFFF3CD), // Lighter yellow text
+    warningContainer: Color(0xFF4D3800),
+    onWarningContainer: Color(0xFFFFF3CD),
   );
 
   @override
@@ -354,35 +357,59 @@ class ApparenceKitColors extends ThemeExtension<ApparenceKitColors> {
     return ApparenceKitColors(
       primary: Color.lerp(primary, other.primary, t)!,
       onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
-      primaryContainer:
-          Color.lerp(primaryContainer, other.primaryContainer, t)!,
-      onPrimaryContainer:
-          Color.lerp(onPrimaryContainer, other.onPrimaryContainer, t)!,
+      primaryContainer: Color.lerp(
+        primaryContainer,
+        other.primaryContainer,
+        t,
+      )!,
+      onPrimaryContainer: Color.lerp(
+        onPrimaryContainer,
+        other.onPrimaryContainer,
+        t,
+      )!,
       secondary: Color.lerp(secondary, other.secondary, t)!,
       onSecondary: Color.lerp(onSecondary, other.onSecondary, t)!,
-      secondaryContainer:
-          Color.lerp(secondaryContainer, other.secondaryContainer, t)!,
-      onSecondaryContainer:
-          Color.lerp(onSecondaryContainer, other.onSecondaryContainer, t)!,
+      secondaryContainer: Color.lerp(
+        secondaryContainer,
+        other.secondaryContainer,
+        t,
+      )!,
+      onSecondaryContainer: Color.lerp(
+        onSecondaryContainer,
+        other.onSecondaryContainer,
+        t,
+      )!,
       tertiary: Color.lerp(tertiary, other.tertiary, t)!,
       onTertiary: Color.lerp(onTertiary, other.onTertiary, t)!,
-      tertiaryContainer:
-          Color.lerp(tertiaryContainer, other.tertiaryContainer, t)!,
-      onTertiaryContainer:
-          Color.lerp(onTertiaryContainer, other.onTertiaryContainer, t)!,
+      tertiaryContainer: Color.lerp(
+        tertiaryContainer,
+        other.tertiaryContainer,
+        t,
+      )!,
+      onTertiaryContainer: Color.lerp(
+        onTertiaryContainer,
+        other.onTertiaryContainer,
+        t,
+      )!,
       background: Color.lerp(background, other.background, t)!,
       onBackground: Color.lerp(onBackground, other.onBackground, t)!,
       surface: Color.lerp(surface, other.surface, t)!,
       onSurface: Color.lerp(onSurface, other.onSurface, t)!,
       surfaceVariant: Color.lerp(surfaceVariant, other.surfaceVariant, t)!,
-      onSurfaceVariant:
-          Color.lerp(onSurfaceVariant, other.onSurfaceVariant, t)!,
+      onSurfaceVariant: Color.lerp(
+        onSurfaceVariant,
+        other.onSurfaceVariant,
+        t,
+      )!,
       favoriteHeart: Color.lerp(error, other.favoriteHeart, t)!,
       error: Color.lerp(error, other.error, t)!,
       onError: Color.lerp(onError, other.onError, t)!,
       errorContainer: Color.lerp(errorContainer, other.errorContainer, t)!,
-      onErrorContainer:
-          Color.lerp(onErrorContainer, other.onErrorContainer, t)!,
+      onErrorContainer: Color.lerp(
+        onErrorContainer,
+        other.onErrorContainer,
+        t,
+      )!,
       neutral100: Color.lerp(neutral100, other.neutral100, t)!,
       neutral200: Color.lerp(neutral200, other.neutral200, t)!,
       neutral300: Color.lerp(neutral300, other.neutral300, t)!,
@@ -390,24 +417,42 @@ class ApparenceKitColors extends ThemeExtension<ApparenceKitColors> {
       outlineVariant: Color.lerp(outlineVariant, other.outlineVariant, t)!,
       shadow: Color.lerp(shadow, other.shadow, t)!,
       inverseSurface: Color.lerp(inverseSurface, other.inverseSurface, t)!,
-      onInverseSurface:
-          Color.lerp(onInverseSurface, other.onInverseSurface, t)!,
+      onInverseSurface: Color.lerp(
+        onInverseSurface,
+        other.onInverseSurface,
+        t,
+      )!,
       inversePrimary: Color.lerp(inversePrimary, other.inversePrimary, t)!,
-      appLogoContainer:
-          Color.lerp(appLogoContainer, other.appLogoContainer, t)!,
+      appLogoContainer: Color.lerp(
+        appLogoContainer,
+        other.appLogoContainer,
+        t,
+      )!,
       appLogo: Color.lerp(appLogo, other.appLogo, t)!,
       success: Color.lerp(success, other.success, t)!,
       onSuccess: Color.lerp(onSuccess, other.onSuccess, t)!,
-      successContainer:
-          Color.lerp(successContainer, other.successContainer, t)!,
-      onSuccessContainer:
-          Color.lerp(onSuccessContainer, other.onSuccessContainer, t)!,
+      successContainer: Color.lerp(
+        successContainer,
+        other.successContainer,
+        t,
+      )!,
+      onSuccessContainer: Color.lerp(
+        onSuccessContainer,
+        other.onSuccessContainer,
+        t,
+      )!,
       warning: Color.lerp(warning, other.warning, t)!,
       onWarning: Color.lerp(onWarning, other.onWarning, t)!,
-      warningContainer:
-          Color.lerp(warningContainer, other.warningContainer, t)!,
-      onWarningContainer:
-          Color.lerp(onWarningContainer, other.onWarningContainer, t)!,
+      warningContainer: Color.lerp(
+        warningContainer,
+        other.warningContainer,
+        t,
+      )!,
+      onWarningContainer: Color.lerp(
+        onWarningContainer,
+        other.onWarningContainer,
+        t,
+      )!,
     );
   }
 }
