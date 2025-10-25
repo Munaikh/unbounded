@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:apparence_kit/core/bottom_menu/bottom_menu_item.dart';
 import 'package:apparence_kit/core/theme/colors.dart';
@@ -30,13 +29,22 @@ class CustomBottomBar extends BartBottomBarFactory {
     void Function(int) onTap,
     int currentIndex,
   ) {
-    return ClipRRect(
-      borderRadius: BorderRadius.only(
-        topLeft: Radius.circular(borderRadius),
-        topRight: Radius.circular(borderRadius),
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            offset: const Offset(0, -1),
+            color: context.colors.shadow.withCustomOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
       ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: blur, sigmaY: blur),
+      child: ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(borderRadius),
+          topRight: Radius.circular(borderRadius),
+        ),
         child: Container(
           padding: EdgeInsets.all(padding),
           decoration: BoxDecoration(

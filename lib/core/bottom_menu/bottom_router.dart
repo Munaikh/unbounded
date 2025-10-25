@@ -1,5 +1,6 @@
 import 'package:animations/animations.dart';
 import 'package:apparence_kit/core/bottom_menu/bottom_menu_item.dart';
+import 'package:apparence_kit/core/widgets/page_not_found.dart';
 import 'package:apparence_kit/modules/home/home_page.dart';
 import 'package:bart/bart.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,34 @@ List<BartMenuRoute> subRoutes() {
             label: "Home",
           ),
       pageBuilder: (_, _, settings) => const HomePage(),
+      transitionDuration: bottomBarTransitionDuration,
+      transitionsBuilder: bottomBarTransition,
+    ),
+        BartMenuRoute.bottomBarBuilder(
+      label: "Home",
+      path: 'home',
+      builder:
+          (context, isActive) => BottomMenuItem(
+            isSelected: isActive,
+            icon: Ionicons.home,
+            iconOutline: Ionicons.home_outline,
+            label: "Home",
+          ),
+      pageBuilder: (_, _, settings) => const PageNotFound(),
+      transitionDuration: bottomBarTransitionDuration,
+      transitionsBuilder: bottomBarTransition,
+    ),
+     BartMenuRoute.bottomBarBuilder(
+      label: "404",
+      path: '404',
+      builder:
+          (context, isActive) => BottomMenuItem(
+            isSelected: isActive,
+            icon: Ionicons.people,
+            iconOutline: Ionicons.people_outline,
+            label: "Society",
+          ),
+      pageBuilder: (_, _, settings) => const PageNotFound(),
       transitionDuration: bottomBarTransitionDuration,
       transitionsBuilder: bottomBarTransition,
     ),

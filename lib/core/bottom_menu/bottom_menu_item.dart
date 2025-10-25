@@ -30,16 +30,7 @@ class BottomMenuItem extends StatelessWidget {
                 isSelected ? context.colors.primary : context.colors.neutral300,
             size: 24,
           ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: context.textTheme.labelMedium?.copyWith(
-              color:
-                  isSelected
-                      ? context.colors.primary
-                      : context.colors.neutral300,
-            ),
-          ),
+          const SizedBox(height: 6),
         ],
       ),
     );
