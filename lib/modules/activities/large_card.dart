@@ -33,23 +33,18 @@ class LargeCard extends StatelessWidget {
           context.push('/activities/$id');
         },
         child: Container(
-          width: (MediaQuery.of(context).size.width) * .7,
-          margin: const EdgeInsets.only(right: 16),
+          width: double.infinity,
           decoration: ShapeDecoration(
-            shape: RoundedSuperellipseBorder(
-              borderRadius: BorderRadius.circular(30),
-            ),
+            shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(30)),
             color: context.colors.surface,
           ),
           clipBehavior: Clip.hardEdge,
           child: Column(
             children: [
-              Expanded(
-                child: Image.network(
-                  imageUrl,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                ),
+              SizedBox(
+                height: 200,
+                width: double.infinity,
+                child: Image.network(imageUrl, fit: BoxFit.cover),
               ),
               Container(
                 width: double.infinity,
@@ -70,11 +65,7 @@ class LargeCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        Icon(
-                          Icons.location_on,
-                          size: 16,
-                          color: context.colors.primary,
-                        ),
+                        Icon(Icons.location_on, size: 16, color: context.colors.primary),
                         const SizedBox(width: 4),
                         Consumer(
                           builder: (context, ref, child) {
@@ -84,14 +75,10 @@ class LargeCard extends StatelessWidget {
                               final lat = double.tryParse(parts[0].trim());
                               final lng = double.tryParse(parts[1].trim());
                               if (lat != null && lng != null) {
-                                final userLocation = ref.watch(
-                                  userLocationProvider.notifier,
-                                );
+                                final userLocation = ref.watch(userLocationProvider.notifier);
                                 userLocation.getUserLocation();
-                                final distanceMeters = userLocation
-                                    .getDistanceTo(lat, lng);
-                                final distanceKm = (distanceMeters / 1000)
-                                    .toStringAsFixed(1);
+                                final distanceMeters = userLocation.getDistanceTo(lat, lng);
+                                final distanceKm = (distanceMeters / 1000).toStringAsFixed(1);
                                 finalDistance = '$distanceKm km';
                               }
                             }
@@ -111,11 +98,7 @@ class LargeCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 16),
-                        Icon(
-                          Icons.group,
-                          size: 16,
-                          color: context.colors.primary,
-                        ),
+                        Icon(Icons.group, size: 16, color: context.colors.primary),
                         const SizedBox(width: 4),
                         Text(
                           '$minGroupSize-$maxGroupSize',
