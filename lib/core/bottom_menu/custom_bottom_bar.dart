@@ -59,10 +59,10 @@ class CustomBottomBar extends BartBottomBarFactory {
                       child: GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onTap: () => onTap(i),
-                        child: routes[i].iconBuilder!(
+                        child: routes[i].iconBuilder?.call(
                           context,
                           i == currentIndex,
-                        ),
+                        ) ?? const SizedBox.shrink(),
                       ),
                     ),
                   ),

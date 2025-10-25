@@ -70,6 +70,7 @@ dependencies:
   mixpanel_flutter: ^2.4.4
   slang: ^4.9.2
   slang_flutter: ^4.9.0
+  ionicons: ^0.2.2
   flutter_localizations:
     sdk: flutter
 
