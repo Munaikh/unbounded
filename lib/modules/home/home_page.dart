@@ -1,11 +1,7 @@
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
-import 'package:apparence_kit/modules/notifications/api/local_notifier.dart';
-import 'package:apparence_kit/modules/notifications/providers/models/notification.dart'
-    as apparence_kit; // this conflicts with material notification ()
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 /// this homepage is for demo purpose only
 /// You can delete it and start from scratch
@@ -22,10 +18,7 @@ class HomePage extends ConsumerWidget {
         child: ListView(
           physics: const NeverScrollableScrollPhysics(),
           children: [
-            Text(
-              "Home page",
-              style: context.textTheme.headlineLarge,
-            ),
+            Text("Home page", style: context.textTheme.headlineLarge),
             Text(
               'Welcome on the ApparenceKit demo',
               style: context.textTheme.bodyLarge?.copyWith(
@@ -35,45 +28,87 @@ class HomePage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 24),
-            HomeCard(
-              title: "Paywall",
-              description: "Show the paywall page",
-              onTap: () => context.push('/premium'),
-              backgroundColor: context.colors.primary,
-              textColor: context.colors.onPrimary,
-            ),
-            const SizedBox(height: 8),
-            HomeCard(
-              title: "Notification test",
-              description:
-                  "Push a local test notification (won't be added into your notifications list)",
-              onTap: () {
-                // this is only for showing you how to show notifcations locally manually
-                // to create a push notification from server -> add a notification in the database.
-                // It will be pushed to the user devices automatically
-                // 🤩 the notifications pushed by the server are automatically shown you don't have to do anything
-                final settings = ref.read(notificationsSettingsProvider);
-                final localNotifier = ref.read(localNotifierProvider);
-                final notif = apparence_kit.Notification.withData(
-                  id: 'fake-id',
-                  title: 'Notification test',
-                  body:
-                      "Push a local test notification (won't be added into your notifications list)",
-                  createdAt: DateTime.now(),
-                  notifier: localNotifier,
-                  notifierSettings: settings,
-                );
-                notif.show();
-              },
-            ),
-            const SizedBox(height: 8),
-            
-            const SizedBox(height: 8),
-            HomeCard(
-              title: "Signup",
-              description:
-                  "Anonymous user can signup using real email or other social login",
-              onTap: () => context.push('/signup'),
+
+            SizedBox(
+              height: 200,
+              child: ListView.builder(
+                shrinkWrap: true,
+                scrollDirection: Axis.horizontal,
+                itemCount: 5,
+                itemBuilder: (context, index) {
+                  return Container(
+                    width: (MediaQuery.of(context).size.width) * .7,
+                    margin: const EdgeInsets.only(right: 16),
+
+                    decoration: ShapeDecoration(
+                      shape: RoundedSuperellipseBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      color: context.colors.surface,
+                    ),
+                    clipBehavior: Clip.hardEdge,
+                    child: Column(
+                      children: [
+                        Expanded(
+                          child: Image.network(
+                            'https://x-kart.co.uk/wp-content/uploads/2022/05/start-outdoor-karting.jpg',
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          ),
+                        ),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          child:  Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Karting Glagow", style: context.textTheme.titleMedium),
+                              const SizedBox(height: 4),
+                              Text(
+                                "Active, Lively, Bookable",
+                                style: context.textTheme.bodyMedium?.copyWith(
+                                  color: context.colors.onSurface.withValues(alpha: .6),
+                                ),
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(Icons.location_on, size: 16, color: context.colors.primary),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "1.4 KM",
+                                    style: context.textTheme.bodyMedium?.copyWith(
+                                      color: context.colors.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Text(
+                                    "\$22 pp",
+                                    style: context.textTheme.bodyMedium?.copyWith(
+                                      color: context.colors.primary,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Icon(Icons.group, size: 16, color: context.colors.primary),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "Group 8-20",
+                                    style: context.textTheme.bodyMedium?.copyWith(
+                                      color: context.colors.primary,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ),
           ],
         ),
@@ -126,10 +161,9 @@ class HomeCard extends StatelessWidget {
               Text(
                 description,
                 style: context.textTheme.bodyMedium?.copyWith(
-                  color: textColor ??
-                      context.colors.onSurface.withValues(
-                        alpha: .6,
-                      ),
+                  color:
+                      textColor ??
+                      context.colors.onSurface.withValues(alpha: .6),
                 ),
               ),
             ],
