@@ -7,6 +7,7 @@ import 'package:apparence_kit/modules/authentication/ui/phone_auth_page.dart';
 import 'package:apparence_kit/modules/authentication/ui/recover_password_page.dart';
 import 'package:apparence_kit/modules/authentication/ui/signin_page.dart';
 import 'package:apparence_kit/modules/authentication/ui/signup_page.dart';
+import 'package:apparence_kit/modules/events/ui/create_event_page.dart';
 import 'package:apparence_kit/modules/onboarding/ui/onboarding_page.dart';
 import 'package:apparence_kit/modules/onboarding/ui/personalization/personalization_wizard.dart';
 import 'package:flutter/material.dart';
@@ -77,6 +78,11 @@ GoRouter generateRouter({
         name: 'personalization',
         path: '/personalization',
         builder: (context, state) => const PersonalizationWizard(),
+      ),
+      GoRoute(
+        name: 'create_event',
+        path: '/events/create',
+        builder: (context, state) => const CreateEventPage(),
       ),
     ],
   );

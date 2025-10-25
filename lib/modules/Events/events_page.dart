@@ -1,10 +1,11 @@
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
-import 'package:apparence_kit/modules/Events/event_card.dart';
-import 'package:apparence_kit/modules/Events/providers/all_events_provider.dart';
+import 'package:apparence_kit/modules/events/event_card.dart';
+import 'package:apparence_kit/modules/events/providers/all_events_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 class EventsPage extends ConsumerWidget {
   const EventsPage({super.key});
@@ -38,6 +39,7 @@ class EventsPage extends ConsumerWidget {
                           : '';
                       return EventCard(
                         title: e.title,
+                        description: e.description,
                         date: displayDate,
                         location: e.location ?? '',
                         statusLabel: 'Invited',
@@ -78,27 +80,31 @@ class EventsPage extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             PressableScale(
-              child: Container(
-                height: 60,
-                decoration: ShapeDecoration(
-                  shape: RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
-                  color: context.colors.primary,
-                  shadows: [
-                    BoxShadow(
-                      color: context.colors.shadow.withCustomOpacity(0.08),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
+              child: GestureDetector(
+                onTap: () => context.push('/events/create'),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  height: 60,
+                  decoration: ShapeDecoration(
+                    shape: RoundedSuperellipseBorder(
+                      borderRadius: BorderRadius.circular(28),
                     ),
-                  ],
-                ),
-                alignment: Alignment.center,
-                child: Text(
-                  'Create an event',
-                  style: context.textTheme.titleMedium?.copyWith(
-                    color: context.colors.onPrimary,
-                    fontWeight: FontWeight.w600,
+                    color: context.colors.primary,
+                    shadows: [
+                      BoxShadow(
+                        color: context.colors.shadow.withCustomOpacity(0.08),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Create an event',
+                    style: context.textTheme.titleMedium?.copyWith(
+                      color: context.colors.onPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),

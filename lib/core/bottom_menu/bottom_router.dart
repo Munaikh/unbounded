@@ -1,7 +1,7 @@
 import 'package:animations/animations.dart';
 import 'package:apparence_kit/core/bottom_menu/bottom_menu_item.dart';
 import 'package:apparence_kit/core/widgets/page_not_found.dart';
-import 'package:apparence_kit/modules/Events/events_page.dart';
+import 'package:apparence_kit/modules/events/events_page.dart';
 import 'package:apparence_kit/modules/home/home_page.dart';
 import 'package:bart/bart.dart';
 import 'package:flutter/material.dart';

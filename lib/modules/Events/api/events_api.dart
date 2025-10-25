@@ -1,5 +1,5 @@
 import 'package:apparence_kit/core/data/api/base_api_exceptions.dart';
-import 'package:apparence_kit/modules/Events/entities/event_entity.dart';
+import 'package:apparence_kit/modules/events/entities/event_entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -48,9 +48,26 @@ class EventsApi {
     }
   }
 
-  Future<void> createEvent(EventEntity event) async {
+  Future<EventEntity> createEvent({
+    required String title,
+    required String description,
+    DateTime? date,
+    String? location,
+    String? bgUrl,
+  }) async {
     try {
-      await client.from(tableName).insert(event.toJson());
+      final response = await client
+          .from(tableName)
+          .insert({
+            'title': title,
+            'description': description,
+            'date': date?.toIso8601String(),
+            'location': location,
+            'bg_url': bgUrl,
+          })
+          .select()
+          .single();
+      return EventEntity.fromJson(response);
     } catch (e, stacktrace) {
       throw ApiError(code: 0, message: 'Error creating event: $e: $stacktrace');
     }

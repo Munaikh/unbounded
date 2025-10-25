@@ -1,5 +1,5 @@
-import 'package:apparence_kit/modules/Events/api/event_participants_api.dart';
-import 'package:apparence_kit/modules/Events/entities/event_participant_entity.dart';
+import 'package:apparence_kit/modules/events/api/event_participants_api.dart';
+import 'package:apparence_kit/modules/events/entities/event_participant_entity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'event_participants_by_event_provider.g.dart';

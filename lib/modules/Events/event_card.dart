@@ -6,6 +6,7 @@ class EventCard extends StatelessWidget {
   final String title;
   final String date;
   final String location;
+  final String description;
   final String statusLabel;
   final List<Color> gradientColors;
   final List<String> participants;
@@ -13,6 +14,7 @@ class EventCard extends StatelessWidget {
     required this.title,
     required this.date,
     required this.location,
+    required this.description,
     required this.statusLabel,
     required this.gradientColors,
     required this.participants,
@@ -21,7 +23,7 @@ class EventCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: (MediaQuery.of(context).size.width) * .72,
+      width: (MediaQuery.of(context).size.width) * .70,
       decoration: ShapeDecoration(
         shape: RoundedSuperellipseBorder(
           borderRadius: BorderRadius.circular(36),
@@ -58,7 +60,7 @@ class EventCard extends StatelessWidget {
                   Text(
                     statusLabel,
                     style: context.textTheme.labelMedium?.copyWith(
-                      color: context.colors.onSurface,
+                      color: context.colors.shadow,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -69,19 +71,31 @@ class EventCard extends StatelessWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const SizedBox(height: 40),
-              CircleAvatar(
-                radius: 48,
-                backgroundColor: Colors.white.withCustomOpacity(.3),
-                child: Text(
-                  'KH',
-                  style: context.textTheme.headlineSmall?.copyWith(
-                    color: Colors.black87,
-                    fontWeight: FontWeight.w700,
+              const SizedBox(height: 60),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: context.colors.shadow.withCustomOpacity(0.10),
+                      blurRadius: 16,
+                      offset: const Offset(0, 10),
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 48,
+                  backgroundColor: Colors.white.withCustomOpacity(.3),
+                  child: Text(
+                    'KH',
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      color: Colors.black87,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 50),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -94,7 +108,7 @@ class EventCard extends StatelessWidget {
                         child: Text(
                           participants[i],
                           style: context.textTheme.labelSmall?.copyWith(
-                            color: context.colors.onSurface,
+                            color: context.colors.shadow,
                             fontWeight: FontWeight.w700,
                           ),
                         ),
@@ -112,6 +126,15 @@ class EventCard extends StatelessWidget {
                       style: context.textTheme.titleLarge?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: context.textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withCustomOpacity(.9),
                       ),
                     ),
                     const SizedBox(height: 6),
