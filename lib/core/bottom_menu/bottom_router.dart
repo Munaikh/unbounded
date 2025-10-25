@@ -11,46 +11,42 @@ List<BartMenuRoute> subRoutes() {
     BartMenuRoute.bottomBarBuilder(
       label: "Home",
       path: 'home',
-      builder:
-          (context, isActive) => BottomMenuItem(
-            isSelected: isActive,
-            icon: Ionicons.home,
-            iconOutline: Ionicons.home_outline,
-            label: "Home",
-          ),
+      builder: (context, isActive) => BottomMenuItem(
+        isSelected: isActive,
+        icon: Ionicons.home,
+        iconOutline: Ionicons.home_outline,
+        label: "Home",
+      ),
       pageBuilder: (_, _, settings) => const HomePage(),
       transitionDuration: bottomBarTransitionDuration,
       transitionsBuilder: bottomBarTransition,
     ),
-        BartMenuRoute.bottomBarBuilder(
-      label: "Home",
-      path: 'home',
-      builder:
-          (context, isActive) => BottomMenuItem(
-            isSelected: isActive,
-            icon: Ionicons.home,
-            iconOutline: Ionicons.home_outline,
-            label: "Home",
-          ),
+    BartMenuRoute.bottomBarBuilder(
+      label: "Invites",
+      path: 'invites',
+      builder: (context, isActive) => BottomMenuItem(
+        isSelected: isActive,
+        icon: Ionicons.people,
+        iconOutline: Ionicons.people_outline,
+        label: "Invites",
+      ),
       pageBuilder: (_, _, settings) => const PageNotFound(),
       transitionDuration: bottomBarTransitionDuration,
       transitionsBuilder: bottomBarTransition,
     ),
-     BartMenuRoute.bottomBarBuilder(
+    BartMenuRoute.bottomBarBuilder(
       label: "404",
       path: '404',
-      builder:
-          (context, isActive) => BottomMenuItem(
-            isSelected: isActive,
-            icon: Ionicons.people,
-            iconOutline: Ionicons.people_outline,
-            label: "Society",
-          ),
+      builder: (context, isActive) => BottomMenuItem(
+        isSelected: isActive,
+        icon: Ionicons.people,
+        iconOutline: Ionicons.people_outline,
+        label: "Society",
+      ),
       pageBuilder: (_, _, settings) => const PageNotFound(),
       transitionDuration: bottomBarTransitionDuration,
       transitionsBuilder: bottomBarTransition,
     ),
-
 
     BartMenuRoute.innerRoute(
       path: '/search',
