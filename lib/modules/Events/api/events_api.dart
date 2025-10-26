@@ -20,31 +20,19 @@ class EventsApi {
           .select()
           .then((value) => value as List<dynamic>);
       return response
-          .map<EventEntity>(
-            (e) => EventEntity.fromJson(e as Map<String, dynamic>),
-          )
+          .map<EventEntity>((e) => EventEntity.fromJson(e as Map<String, dynamic>))
           .toList();
     } catch (e, stacktrace) {
-      throw ApiError(
-        code: 0,
-        message: 'Error fetching events: $e: $stacktrace',
-      );
+      throw ApiError(code: 0, message: 'Error fetching events: $e: $stacktrace');
     }
   }
 
   Future<EventEntity> getEventDetails(String eventId) async {
     try {
-      final response = await client
-          .from(tableName)
-          .select()
-          .eq('id', eventId)
-          .single();
+      final response = await client.from(tableName).select().eq('id', eventId).single();
       return EventEntity.fromJson(response);
     } catch (e, stacktrace) {
-      throw ApiError(
-        code: 0,
-        message: 'Error fetching event details: $e: $stacktrace',
-      );
+      throw ApiError(code: 0, message: 'Error fetching event details: $e: $stacktrace');
     }
   }
 
