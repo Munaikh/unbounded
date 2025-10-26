@@ -35,7 +35,9 @@ class LargeCard extends StatelessWidget {
         child: Container(
           width: double.infinity,
           decoration: ShapeDecoration(
-            shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(30)),
+            shape: RoundedSuperellipseBorder(
+              borderRadius: BorderRadius.circular(36),
+            ),
             color: context.colors.surface,
           ),
           clipBehavior: Clip.hardEdge,

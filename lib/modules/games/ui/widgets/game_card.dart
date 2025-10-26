@@ -1,4 +1,5 @@
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
+import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:apparence_kit/modules/games/domain/game.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -33,20 +34,20 @@ class GameCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final categoryColor = _getCategoryColor(game.category);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: context.colors.surface,
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16),
+    return PressableScale(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: ShapeDecoration(
+            shape: RoundedSuperellipseBorder(
+              borderRadius: BorderRadius.circular(36),
+            ),
+            color: context.colors.surface,
+          ),
+          clipBehavior: Clip.hardEdge,
+          child: Padding(
+            padding: const EdgeInsets.all(20),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -78,10 +79,15 @@ class GameCard extends StatelessWidget {
                               ),
                               const SizedBox(height: 4),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: categoryColor.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(8),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: ShapeDecoration(
+                              shape: RoundedSuperellipseBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              color: categoryColor.withValues(alpha: 0.15),
                                 ),
                                 child: Text(
                                   _getCategoryName(game.category),
@@ -146,19 +152,29 @@ class GameCard extends StatelessWidget {
                     if (game.tags.isNotEmpty) ...[
                       const SizedBox(height: 12),
                       Wrap(
-                        spacing: 6,
-                        runSpacing: 6,
+                    spacing: 8,
+                    runSpacing: 8,
                         children: game.tags.map((tag) {
                           return Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: context.colors.onSurface.withValues(alpha: 0.06),
-                              borderRadius: BorderRadius.circular(6),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: ShapeDecoration(
+                          shape: RoundedSuperellipseBorder(
+                            borderRadius: BorderRadius.circular(100),
+                          ),
+                          color: context.colors.onSurface.withValues(
+                            alpha: 0.08,
+                          ),
                             ),
                             child: Text(
                               tag,
                               style: context.textTheme.labelSmall?.copyWith(
-                                color: context.colors.onSurface.withValues(alpha: 0.6),
+                            color: context.colors.onSurface.withValues(
+                              alpha: 0.7,
+                            ),
+                            fontWeight: FontWeight.w500,
                               ),
                             ),
                           );
@@ -166,9 +182,7 @@ class GameCard extends StatelessWidget {
                       ),
                     ],
                   ],
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       ),
@@ -177,21 +191,23 @@ class GameCard extends StatelessWidget {
 
   Widget _buildInfoChip(BuildContext context, IconData icon, String text) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: context.colors.onSurface.withValues(alpha: 0.06),
-        borderRadius: BorderRadius.circular(8),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: ShapeDecoration(
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(100),
+        ),
+        color: context.colors.onSurface.withValues(alpha: 0.08),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(icon, size: 16, color: context.colors.onSurface.withValues(alpha: 0.6)),
-          const SizedBox(width: 4),
+          const SizedBox(width: 6),
           Text(
             text,
             style: context.textTheme.labelSmall?.copyWith(
               color: context.colors.onSurface.withValues(alpha: 0.7),
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
