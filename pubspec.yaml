@@ -74,6 +74,7 @@ dependencies:
   liquid_glass_renderer: ^0.1.1-dev.26
   geocoding: ^4.0.0
   geolocator: ^14.0.0
+  unsplash_client: ^3.0.0
   
   flutter_localizations:
     sdk: flutter
