@@ -239,52 +239,72 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                               future: ref.read(userApiProvider).get(event.owner),
                               builder: (context, userSnapshot) {
                                 final creatorName = userSnapshot.data?.name ?? 'Event';
-                                return ClipOval(
-                                  child: BackdropFilter(
-                                    filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-                                    child: Container(
-                                      width: 120,
-                                      height: 120,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topLeft,
-                                          end: Alignment.bottomRight,
-                                          colors: [
-                                            Colors.white.withValues(alpha: 0.4),
-                                            Colors.white.withValues(alpha: 0.2),
-                                          ],
-                                        ),
-                                        border: Border.all(
-                                          color: Colors.white.withValues(alpha: 0.3),
-                                          width: 1.5,
-                                        ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.black.withValues(alpha: 0.2),
-                                            blurRadius: 20,
-                                            offset: const Offset(0, 10),
-                                          ),
-                                        ],
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          _getInitials(creatorName),
-                                          style: context.textTheme.displaySmall?.copyWith(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w700,
-                                            shadows: [
-                                              Shadow(
-                                                color: Colors.black.withValues(alpha: 0.3),
-                                                offset: const Offset(0, 2),
-                                                blurRadius: 4,
+                                return Column(
+                                  children: [
+                                    ClipOval(
+                                      child: BackdropFilter(
+                                        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                                        child: Container(
+                                          width: 120,
+                                          height: 120,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            gradient: LinearGradient(
+                                              begin: Alignment.topLeft,
+                                              end: Alignment.bottomRight,
+                                              colors: [
+                                                Colors.white.withValues(alpha: 0.4),
+                                                Colors.white.withValues(alpha: 0.2),
+                                              ],
+                                            ),
+                                            border: Border.all(
+                                              color: Colors.white.withValues(alpha: 0.3),
+                                              width: 1.5,
+                                            ),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black.withValues(alpha: 0.2),
+                                                blurRadius: 20,
+                                                offset: const Offset(0, 10),
                                               ),
                                             ],
+                                          ),
+                                          child: Center(
+                                            child: Text(
+                                              _getInitials(creatorName),
+                                              style: context.textTheme.displaySmall?.copyWith(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.w700,
+                                                shadows: [
+                                                  Shadow(
+                                                    color: Colors.black.withValues(alpha: 0.3),
+                                                    offset: const Offset(0, 2),
+                                                    blurRadius: 4,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'by $creatorName',
+                                      style: context.textTheme.titleLarge?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                        shadows: [
+                                          Shadow(
+                                            color: Colors.black.withValues(alpha: 0.3),
+                                            offset: const Offset(0, 2),
+                                            blurRadius: 4,
+                                          ),
+                                        ],
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ],
                                 );
                               },
                             ),
@@ -623,58 +643,68 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                                                   ),
                                                 );
                                               }
-                                              return Wrap(
+                                              return Column(
                                                 spacing: 12,
-                                                runSpacing: 12,
                                                 children: [
                                                   for (final u in users)
-                                                    ClipOval(
-                                                      child: BackdropFilter(
-                                                        filter: ImageFilter.blur(
-                                                          sigmaX: 8,
-                                                          sigmaY: 8,
-                                                        ),
-                                                        child: Container(
-                                                          width: 48,
-                                                          height: 48,
-                                                          decoration: BoxDecoration(
-                                                            shape: BoxShape.circle,
-                                                            gradient: LinearGradient(
-                                                              begin: Alignment.topLeft,
-                                                              end: Alignment.bottomRight,
-                                                              colors: [
-                                                                Colors.white.withValues(alpha: 0.3),
-                                                                Colors.white.withValues(
-                                                                  alpha: 0.15,
-                                                                ),
-                                                              ],
+                                                    Row(
+                                                      children: [
+                                                        ClipOval(
+                                                          child: BackdropFilter(
+                                                            filter: ImageFilter.blur(
+                                                              sigmaX: 8,
+                                                              sigmaY: 8,
                                                             ),
-                                                            border: Border.all(
-                                                              color: Colors.white.withValues(
-                                                                alpha: 0.4,
+                                                            child: Container(
+                                                              width: 48,
+                                                              height: 48,
+                                                              decoration: BoxDecoration(
+                                                                shape: BoxShape.circle,
+                                                                gradient: LinearGradient(
+                                                                  begin: Alignment.topLeft,
+                                                                  end: Alignment.bottomRight,
+                                                                  colors: [
+                                                                    Colors.white.withValues(alpha: 0.3),
+                                                                    Colors.white.withValues(
+                                                                      alpha: 0.15,
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                                border: Border.all(
+                                                                  color: Colors.white.withValues(
+                                                                    alpha: 0.4,
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                              child: Center(
+                                                                child: Text(
+                                                                  _initialsFromName(u.name ?? ''),
+                                                                  style: context.textTheme.bodyMedium
+                                                                      ?.copyWith(
+                                                                        color: Colors.white,
+                                                                        fontWeight: FontWeight.w600,
+                                                                        shadows: [
+                                                                          Shadow(
+                                                                            color: Colors.black
+                                                                                .withValues(alpha: 0.3),
+                                                                            offset: const Offset(0, 1),
+                                                                            blurRadius: 2,
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                ),
                                                               ),
                                                             ),
                                                           ),
-                                                          child: Center(
-                                                            child: Text(
-                                                              _initialsFromName(u.name ?? ''),
-                                                              style: context.textTheme.bodyMedium
-                                                                  ?.copyWith(
-                                                                    color: Colors.white,
-                                                                    fontWeight: FontWeight.w600,
-                                                                    shadows: [
-                                                                      Shadow(
-                                                                        color: Colors.black
-                                                                            .withValues(alpha: 0.3),
-                                                                        offset: const Offset(0, 1),
-                                                                        blurRadius: 2,
-                                                                      ),
-                                                                    ],
-                                                                  ),
-                                                            ),
+                                                        ),
+                                                        const SizedBox(width: 12),
+                                                        Text(
+                                                          u.name ?? '',
+                                                          style: context.textTheme.bodyLarge?.copyWith(
+                                                            color: Colors.white,
                                                           ),
                                                         ),
-                                                      ),
+                                                      ],
                                                     ),
                                                 ],
                                               );
