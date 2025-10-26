@@ -3,6 +3,7 @@ import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:apparence_kit/modules/events/event_card.dart';
 import 'package:apparence_kit/modules/events/providers/all_events_provider.dart';
+import 'package:apparence_kit/modules/events/providers/user_joined_events_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -13,6 +14,8 @@ class EventsPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final eventsAsync = ref.watch(allEventsProvider);
+    final joinedEventsAsync = ref.watch(userJoinedEventsProvider);
+    
     return Scaffold(
       backgroundColor: context.colors.background,
       body: SafeArea(
@@ -21,6 +24,66 @@ class EventsPage extends ConsumerWidget {
           children: [
             Text('Events', style: context.textTheme.headlineLarge),
             const SizedBox(height: 12),
+            
+            // My Events Section
+            joinedEventsAsync.when(
+              data: (joinedEvents) {
+                if (joinedEvents.isEmpty) {
+                  return const SizedBox.shrink();
+                }
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'My Events',
+                      style: context.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      height: 420,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: joinedEvents.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 16),
+                        itemBuilder: (context, index) {
+                          final e = joinedEvents[index];
+                          final displayDate = e.date != null
+                              ? '${e.date!.toLocal()}'
+                              : '';
+                          return EventCard(
+                            title: e.title,
+                            description: e.description,
+                            date: displayDate,
+                            location: e.location ?? '',
+                            statusLabel: 'Attending',
+                            gradientColors: const [
+                              Color(0xFF6DD5FA),
+                              Color(0xFF2980B9),
+                              Color(0xFF1E3C72),
+                            ],
+                            participants: const ['AA', 'MA', 'KH'],
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(height: 32),
+                    Text(
+                      'All Events',
+                      style: context.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
+                );
+              },
+              error: (_, __) => const SizedBox.shrink(),
+              loading: () => const SizedBox.shrink(),
+            ),
+
+            // All Events Section
             eventsAsync.when(
               data: (events) {
                 if (events.isEmpty) {
@@ -61,6 +124,7 @@ class EventsPage extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 32),
+            
             Text(
               'Start an event, get\neveryone on board',
               style: context.textTheme.headlineSmall?.copyWith(

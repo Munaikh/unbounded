@@ -36,5 +36,27 @@ class EventParticipantsApi {
       );
     }
   }
+
+  Future<List<EventParticipantEntity>> getForUser({
+    required String userId,
+  }) async {
+    try {
+      final List<dynamic> response = await client
+          .from(tableName)
+          .select('*')
+          .eq('user_id', userId);
+      Logger().i('👥 User event participations: $response');
+      return response
+          .map<EventParticipantEntity>(
+            (e) => EventParticipantEntity.fromJson(e as Map<String, dynamic>),
+          )
+          .toList();
+    } catch (e, stacktrace) {
+      throw ApiError(
+        code: 0,
+        message: 'Error fetching user participations: $e: $stacktrace',
+      );
+    }
+  }
 }
 
