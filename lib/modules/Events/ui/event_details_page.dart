@@ -4,17 +4,18 @@ import 'package:apparence_kit/core/data/api/user_api.dart';
 import 'package:apparence_kit/core/data/entities/user_entity.dart';
 import 'package:apparence_kit/core/data/models/user.dart';
 import 'package:apparence_kit/core/states/user_state_notifier.dart';
-import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:apparence_kit/core/widgets/toast.dart';
 import 'package:apparence_kit/modules/events/api/event_participants_api.dart';
 import 'package:apparence_kit/modules/events/api/events_api.dart';
-import 'package:apparence_kit/modules/events/providers/user_joined_events_provider.dart';
+import 'package:apparence_kit/modules/events/providers/event_activity_provider.dart';
 import 'package:apparence_kit/modules/events/providers/event_attendees_provider.dart';
+import 'package:apparence_kit/modules/events/providers/user_joined_events_provider.dart';
 import 'package:apparence_kit/modules/events/ui/widgets/name_input_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 class EventDetailsPage extends ConsumerStatefulWidget {
@@ -41,10 +42,7 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
       final userState = ref.read(userStateNotifierProvider);
       final userId = userState.user.idOrThrow;
       final participantsApi = ref.read(eventParticipantsApiProvider);
-      final isJoined = await participantsApi.isUserJoined(
-        eventId: widget.eventId,
-        userId: userId,
-      );
+      final isJoined = await participantsApi.isUserJoined(eventId: widget.eventId, userId: userId);
       if (mounted) {
         setState(() => _isJoined = isJoined);
       }
@@ -90,20 +88,12 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
         try {
           final userApi = ref.read(userApiProvider);
           final userId = user.idOrThrow;
-          await userApi.update(
-            UserEntity(
-              id: userId,
-              name: enteredName,
-            ),
-          );
+          await userApi.update(UserEntity(id: userId, name: enteredName));
           // Refresh user state
           await ref.read(userStateNotifierProvider.notifier).refresh();
         } catch (e) {
           if (mounted) {
-            ref.read(toastProvider).error(
-                  title: 'Error',
-                  text: 'Failed to update name: $e',
-                );
+            ref.read(toastProvider).error(title: 'Error', text: 'Failed to update name: $e');
           }
           return;
         }
@@ -115,30 +105,17 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
       final userId = user.idOrThrow;
       final participantsApi = ref.read(eventParticipantsApiProvider);
       if (_isJoined) {
-        await participantsApi.leaveEvent(
-          eventId: widget.eventId,
-          userId: userId,
-        );
+        await participantsApi.leaveEvent(eventId: widget.eventId, userId: userId);
         if (mounted) {
-          ref
-              .read(toastProvider)
-              .success(title: 'Left Event', text: 'You have left the event');
+          ref.read(toastProvider).success(title: 'Left Event', text: 'You have left the event');
           setState(() => _isJoined = false);
           ref.invalidate(userJoinedEventsProvider);
           ref.invalidate(eventAttendeesProvider(widget.eventId));
         }
       } else {
-        await participantsApi.joinEvent(
-          eventId: widget.eventId,
-          userId: userId,
-        );
+        await participantsApi.joinEvent(eventId: widget.eventId, userId: userId);
         if (mounted) {
-          ref
-              .read(toastProvider)
-              .success(
-                title: 'Joined Event',
-                text: 'You have joined the event',
-              );
+          ref.read(toastProvider).success(title: 'Joined Event', text: 'You have joined the event');
           setState(() => _isJoined = true);
           ref.invalidate(userJoinedEventsProvider);
           ref.invalidate(eventAttendeesProvider(widget.eventId));
@@ -148,10 +125,7 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
       if (mounted) {
         ref
             .read(toastProvider)
-            .error(
-              title: 'Error',
-              text: 'Failed to ${_isJoined ? 'leave' : 'join'} event: $e',
-            );
+            .error(title: 'Error', text: 'Failed to ${_isJoined ? 'leave' : 'join'} event: $e');
       }
     } finally {
       if (mounted) setState(() => _isProcessing = false);
@@ -176,21 +150,15 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
       future: ref.read(eventsApiProvider).getEventDetails(widget.eventId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
 
         if (snapshot.hasError) {
-          return Scaffold(
-            body: Center(child: Text('Error: ${snapshot.error}')),
-          );
+          return Scaffold(body: Center(child: Text('Error: ${snapshot.error}')));
         }
 
         if (!snapshot.hasData) {
-          return const Scaffold(
-            body: Center(child: Text('Event not found')),
-          );
+          return const Scaffold(body: Center(child: Text('Event not found')));
         }
 
         final event = snapshot.data!;
@@ -210,11 +178,7 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                               gradient: LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
-                                colors: [
-                                  Color(0xFFBFA8FF),
-                                  Color(0xFF6857C9),
-                                  Color(0xFF4B35F2),
-                                ],
+                                colors: [Color(0xFFBFA8FF), Color(0xFF6857C9), Color(0xFF4B35F2)],
                               ),
                             ),
                           );
@@ -225,11 +189,7 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                           gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [
-                              Color(0xFFBFA8FF),
-                              Color(0xFF6857C9),
-                              Color(0xFF4B35F2),
-                            ],
+                            colors: [Color(0xFFBFA8FF), Color(0xFF6857C9), Color(0xFF4B35F2)],
                           ),
                         ),
                       ),
@@ -260,10 +220,7 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                         children: [
                           IconButton(
                             onPressed: () => Navigator.of(context).maybePop(),
-                            icon: const Icon(
-                              Icons.arrow_back_ios_new_rounded,
-                              color: Colors.white,
-                            ),
+                            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
                             splashColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                           ),
@@ -350,10 +307,7 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(24),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.3),
-                                      width: 1,
-                                    ),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                                   ),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,6 +367,209 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                               ),
                             ),
                             const SizedBox(height: 24),
+                            // Linked Activity section with glassmorphism
+                            if (event.activityId != null)
+                              Consumer(
+                                builder: (context, ref, _) {
+                                  final activityAsync = ref.watch(
+                                    eventActivityProvider(event.activityId!),
+                                  );
+                                  return activityAsync.when(
+                                    data: (activity) {
+                                      if (activity == null) {
+                                        return const SizedBox.shrink();
+                                      }
+                                      return Column(
+                                        children: [
+                                          PressableScale(
+                                            child: GestureDetector(
+                                              onTap: () {
+                                                context.push('/activities/${activity.id}');
+                                              },
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.circular(24),
+                                                child: BackdropFilter(
+                                                  filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                                  child: Container(
+                                                    width: double.infinity,
+                                                    padding: const EdgeInsets.all(24),
+                                                    decoration: BoxDecoration(
+                                                      gradient: LinearGradient(
+                                                        begin: Alignment.topLeft,
+                                                        end: Alignment.bottomRight,
+                                                        colors: [
+                                                          Colors.white.withValues(alpha: 0.25),
+                                                          Colors.white.withValues(alpha: 0.15),
+                                                        ],
+                                                      ),
+                                                      borderRadius: BorderRadius.circular(24),
+                                                      border: Border.all(
+                                                        color: Colors.white.withValues(alpha: 0.3),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      children: [
+                                                        if (activity.imageUrl != null &&
+                                                            activity.imageUrl!.isNotEmpty)
+                                                          ClipRRect(
+                                                            borderRadius: BorderRadius.circular(16),
+                                                            child: Image.network(
+                                                              activity.imageUrl!,
+                                                              width: 80,
+                                                              height: 80,
+                                                              fit: BoxFit.cover,
+                                                              errorBuilder:
+                                                                  (context, error, stackTrace) {
+                                                                    return Container(
+                                                                      width: 80,
+                                                                      height: 80,
+                                                                      decoration: BoxDecoration(
+                                                                        color: Colors.white
+                                                                            .withValues(alpha: 0.2),
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                              16,
+                                                                            ),
+                                                                      ),
+                                                                      child: Icon(
+                                                                        Icons
+                                                                            .local_activity_rounded,
+                                                                        color: Colors.white
+                                                                            .withValues(alpha: 0.7),
+                                                                        size: 36,
+                                                                      ),
+                                                                    );
+                                                                  },
+                                                            ),
+                                                          )
+                                                        else
+                                                          Container(
+                                                            width: 80,
+                                                            height: 80,
+                                                            decoration: BoxDecoration(
+                                                              color: Colors.white.withValues(
+                                                                alpha: 0.2,
+                                                              ),
+                                                              borderRadius: BorderRadius.circular(
+                                                                16,
+                                                              ),
+                                                            ),
+                                                            child: Icon(
+                                                              Icons.local_activity_rounded,
+                                                              color: Colors.white.withValues(
+                                                                alpha: 0.7,
+                                                              ),
+                                                              size: 36,
+                                                            ),
+                                                          ),
+                                                        const SizedBox(width: 16),
+                                                        Expanded(
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment.start,
+                                                            children: [
+                                                              Text(
+                                                                'Linked Activity',
+                                                                style: context.textTheme.bodySmall
+                                                                    ?.copyWith(
+                                                                      color: Colors.white
+                                                                          .withValues(alpha: 0.8),
+                                                                      fontWeight: FontWeight.w500,
+                                                                      letterSpacing: 0.5,
+                                                                      shadows: [
+                                                                        Shadow(
+                                                                          color: Colors.black
+                                                                              .withValues(
+                                                                                alpha: 0.3,
+                                                                              ),
+                                                                          offset: const Offset(
+                                                                            0,
+                                                                            1,
+                                                                          ),
+                                                                          blurRadius: 2,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                              ),
+                                                              const SizedBox(height: 6),
+                                                              Text(
+                                                                activity.name,
+                                                                style: context.textTheme.titleMedium
+                                                                    ?.copyWith(
+                                                                      color: Colors.white,
+                                                                      fontWeight: FontWeight.w700,
+                                                                      shadows: [
+                                                                        Shadow(
+                                                                          color: Colors.black
+                                                                              .withValues(
+                                                                                alpha: 0.3,
+                                                                              ),
+                                                                          offset: const Offset(
+                                                                            0,
+                                                                            2,
+                                                                          ),
+                                                                          blurRadius: 4,
+                                                                        ),
+                                                                      ],
+                                                                    ),
+                                                              ),
+                                                              if (activity.description != null &&
+                                                                  activity
+                                                                      .description!
+                                                                      .isNotEmpty) ...[
+                                                                const SizedBox(height: 4),
+                                                                Text(
+                                                                  activity.description!,
+                                                                  style: context.textTheme.bodySmall
+                                                                      ?.copyWith(
+                                                                        color: Colors.white
+                                                                            .withValues(alpha: 0.7),
+                                                                        height: 1.4,
+                                                                        shadows: [
+                                                                          Shadow(
+                                                                            color: Colors.black
+                                                                                .withValues(
+                                                                                  alpha: 0.2,
+                                                                                ),
+                                                                            offset: const Offset(
+                                                                              0,
+                                                                              1,
+                                                                            ),
+                                                                            blurRadius: 2,
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                  maxLines: 2,
+                                                                  overflow: TextOverflow.ellipsis,
+                                                                ),
+                                                              ],
+                                                            ],
+                                                          ),
+                                                        ),
+                                                        const SizedBox(width: 8),
+                                                        Icon(
+                                                          Icons.arrow_forward_ios_rounded,
+                                                          color: Colors.white.withValues(
+                                                            alpha: 0.8,
+                                                          ),
+                                                          size: 20,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(height: 24),
+                                        ],
+                                      );
+                                    },
+                                    loading: () => const SizedBox.shrink(),
+                                    error: (e, _) => const SizedBox.shrink(),
+                                  );
+                                },
+                              ),
                             // Participants section with glassmorphism
                             ClipRRect(
                               borderRadius: BorderRadius.circular(24),
@@ -431,10 +588,7 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                                       ],
                                     ),
                                     borderRadius: BorderRadius.circular(24),
-                                    border: Border.all(
-                                      color: Colors.white.withValues(alpha: 0.3),
-                                      width: 1,
-                                    ),
+                                    border: Border.all(color: Colors.white.withValues(alpha: 0.3)),
                                   ),
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -476,7 +630,10 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                                                   for (final u in users)
                                                     ClipOval(
                                                       child: BackdropFilter(
-                                                        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                                        filter: ImageFilter.blur(
+                                                          sigmaX: 8,
+                                                          sigmaY: 8,
+                                                        ),
                                                         child: Container(
                                                           width: 48,
                                                           height: 48,
@@ -487,28 +644,33 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                                                               end: Alignment.bottomRight,
                                                               colors: [
                                                                 Colors.white.withValues(alpha: 0.3),
-                                                                Colors.white.withValues(alpha: 0.15),
+                                                                Colors.white.withValues(
+                                                                  alpha: 0.15,
+                                                                ),
                                                               ],
                                                             ),
                                                             border: Border.all(
-                                                              color: Colors.white.withValues(alpha: 0.4),
-                                                              width: 1,
+                                                              color: Colors.white.withValues(
+                                                                alpha: 0.4,
+                                                              ),
                                                             ),
                                                           ),
                                                           child: Center(
                                                             child: Text(
                                                               _initialsFromName(u.name ?? ''),
-                                                              style: context.textTheme.bodyMedium?.copyWith(
-                                                                color: Colors.white,
-                                                                fontWeight: FontWeight.w600,
-                                                                shadows: [
-                                                                  Shadow(
-                                                                    color: Colors.black.withValues(alpha: 0.3),
-                                                                    offset: const Offset(0, 1),
-                                                                    blurRadius: 2,
+                                                              style: context.textTheme.bodyMedium
+                                                                  ?.copyWith(
+                                                                    color: Colors.white,
+                                                                    fontWeight: FontWeight.w600,
+                                                                    shadows: [
+                                                                      Shadow(
+                                                                        color: Colors.black
+                                                                            .withValues(alpha: 0.3),
+                                                                        offset: const Offset(0, 1),
+                                                                        blurRadius: 2,
+                                                                      ),
+                                                                    ],
                                                                   ),
-                                                                ],
-                                                              ),
                                                             ),
                                                           ),
                                                         ),
@@ -569,14 +731,14 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                                                   Colors.white.withValues(alpha: 0.1),
                                                 ]
                                               : _isJoined
-                                                  ? [
-                                                      const Color(0xFFFF6B6B).withValues(alpha: 0.8),
-                                                      const Color(0xFFEE5A6F).withValues(alpha: 0.7),
-                                                    ]
-                                                  : [
-                                                      Colors.white.withValues(alpha: 0.35),
-                                                      Colors.white.withValues(alpha: 0.25),
-                                                    ],
+                                              ? [
+                                                  const Color(0xFFFF6B6B).withValues(alpha: 0.8),
+                                                  const Color(0xFFEE5A6F).withValues(alpha: 0.7),
+                                                ]
+                                              : [
+                                                  Colors.white.withValues(alpha: 0.35),
+                                                  Colors.white.withValues(alpha: 0.25),
+                                                ],
                                         ),
                                         borderRadius: BorderRadius.circular(100),
                                         border: Border.all(
@@ -656,11 +818,8 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
 class _GlassInfoChip extends StatelessWidget {
   final IconData icon;
   final String label;
-  
-  const _GlassInfoChip({
-    required this.icon,
-    required this.label,
-  });
+
+  const _GlassInfoChip({required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -674,16 +833,10 @@ class _GlassInfoChip extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.3),
-                Colors.white.withValues(alpha: 0.2),
-              ],
+              colors: [Colors.white.withValues(alpha: 0.3), Colors.white.withValues(alpha: 0.2)],
             ),
             borderRadius: BorderRadius.circular(100),
-            border: Border.all(
-              color: Colors.white.withValues(alpha: 0.4),
-              width: 1,
-            ),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
