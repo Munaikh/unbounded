@@ -41,11 +41,31 @@ class UserApi {
     }
   }
 
+  Future<List<UserEntity>> getManyByIds(List<String> ids) async {
+    if (ids.isEmpty) {
+      return [];
+    }
+    try {
+      final res = await _client
+          .from('users') //
+          .select()
+          .inFilter('id', ids);
+      return (res as List)
+          .map((e) => UserEntity.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e, stacktrace) {
+      throw ApiError(code: 0, message: '$e: $stacktrace');
+    }
+  }
+
   Future<void> update(UserEntity user) async {
     try {
+      final Map<String, dynamic> data = Map.of(user.toJson());
+      data.remove('id');
+      data.removeWhere((key, value) => value == null);
       await _client
           .from('users') //
-          .update(user.toJson())
+          .update(data)
           .eq('id', user.id!);
     } catch (e, stacktrace) {
       throw ApiError(
@@ -85,9 +105,12 @@ class UserApi {
 
   Future<void> create(UserEntity user) async {
     try {
+      final Map<String, dynamic> data = Map.of(user.toJson());
+      data.remove('id');
+      data.removeWhere((key, value) => value == null);
       await _client
           .from('users') //
-          .insert([user.toJson()]);
+          .insert([data]);
     } catch (e, stacktrace) {
       throw ApiError(
         code: 0,

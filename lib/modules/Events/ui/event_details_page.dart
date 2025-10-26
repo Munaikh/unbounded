@@ -1,3 +1,6 @@
+import 'package:apparence_kit/core/data/api/user_api.dart';
+import 'package:apparence_kit/core/data/entities/user_entity.dart';
+import 'package:apparence_kit/core/data/models/user.dart';
 import 'package:apparence_kit/core/states/user_state_notifier.dart';
 import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
@@ -6,6 +9,8 @@ import 'package:apparence_kit/core/widgets/toast.dart';
 import 'package:apparence_kit/modules/events/api/event_participants_api.dart';
 import 'package:apparence_kit/modules/events/api/events_api.dart';
 import 'package:apparence_kit/modules/events/providers/user_joined_events_provider.dart';
+import 'package:apparence_kit/modules/events/providers/event_attendees_provider.dart';
+import 'package:apparence_kit/modules/events/ui/widgets/name_input_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -45,10 +50,67 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
   }
 
   Future<void> _toggleJoinEvent() async {
+    final userState = ref.read(userStateNotifierProvider);
+    final user = userState.user;
+
+    // Check if user has a name when trying to join
+    if (!_isJoined) {
+      String? userName;
+      if (user case AuthenticatedUserData(:final name)) {
+        userName = name;
+      }
+
+      // If name not in current state (e.g., anonymous user variant), read from DB
+      if (userName == null || userName.trim().isEmpty) {
+        try {
+          final current = await ref.read(userApiProvider).get(user.idOrThrow);
+          final dbName = current?.name;
+          if (dbName != null && dbName.trim().isNotEmpty) {
+            userName = dbName;
+          }
+        } catch (_) {}
+      }
+
+      if (userName == null || userName.trim().isEmpty) {
+        // Show name input dialog
+        final String? enteredName = await showDialog<String>(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => const NameInputDialog(),
+        );
+
+        if (enteredName == null) {
+          // User cancelled
+          return;
+        }
+
+        // Update user name in database
+        try {
+          final userApi = ref.read(userApiProvider);
+          final userId = user.idOrThrow;
+          await userApi.update(
+            UserEntity(
+              id: userId,
+              name: enteredName,
+            ),
+          );
+          // Refresh user state
+          await ref.read(userStateNotifierProvider.notifier).refresh();
+        } catch (e) {
+          if (mounted) {
+            ref.read(toastProvider).error(
+                  title: 'Error',
+                  text: 'Failed to update name: $e',
+                );
+          }
+          return;
+        }
+      }
+    }
+
     setState(() => _isProcessing = true);
     try {
-      final userState = ref.read(userStateNotifierProvider);
-      final userId = userState.user.idOrThrow;
+      final userId = user.idOrThrow;
       final participantsApi = ref.read(eventParticipantsApiProvider);
       if (_isJoined) {
         await participantsApi.leaveEvent(
@@ -61,6 +123,7 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
               .success(title: 'Left Event', text: 'You have left the event');
           setState(() => _isJoined = false);
           ref.invalidate(userJoinedEventsProvider);
+          ref.invalidate(eventAttendeesProvider(widget.eventId));
         }
       } else {
         await participantsApi.joinEvent(
@@ -76,6 +139,7 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
               );
           setState(() => _isJoined = true);
           ref.invalidate(userJoinedEventsProvider);
+          ref.invalidate(eventAttendeesProvider(widget.eventId));
         }
       }
     } catch (e) {
@@ -270,26 +334,69 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                for (final initial in ['AA', 'MA', 'KH'])
-                                  Padding(
-                                    padding: const EdgeInsets.only(right: 12),
-                                    child: CircleAvatar(
-                                      radius: 20,
-                                      backgroundColor: context.colors.primary
-                                          .withCustomOpacity(0.15),
-                                      child: Text(
-                                        initial,
+                            Consumer(
+                              builder: (context, ref, _) {
+                                final attendeesAsync = ref.watch(
+                                  eventAttendeesProvider(widget.eventId),
+                                );
+                                return attendeesAsync.when(
+                                  data: (users) {
+                                    if (users.isEmpty) {
+                                      return Text(
+                                        'No participants yet',
                                         style: context.textTheme.bodyMedium
                                             ?.copyWith(
-                                              color: context.colors.primary,
-                                              fontWeight: FontWeight.w600,
+                                          color: context.colors.onBackground
+                                              .withCustomOpacity(0.6),
+                                        ),
+                                      );
+                                    }
+                                    return Wrap(
+                                      spacing: 12,
+                                      runSpacing: 12,
+                                      children: [
+                                        for (final u in users)
+                                          CircleAvatar(
+                                            radius: 20,
+                                            backgroundColor: context.colors
+                                                .primary
+                                                .withCustomOpacity(0.15),
+                                            child: Text(
+                                              _initialsFromName(u.name ?? ''),
+                                              style: context
+                                                  .textTheme.bodyMedium
+                                                  ?.copyWith(
+                                                color:
+                                                    context.colors.primary,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
+                                          ),
+                                      ],
+                                    );
+                                  },
+                                  loading: () => SizedBox(
+                                    height: 44,
+                                    child: Align(
+                                      alignment: Alignment.centerLeft,
+                                      child: SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
                                       ),
                                     ),
                                   ),
-                              ],
+                                  error: (e, _) => Text(
+                                    'Failed to load participants',
+                                    style: context.textTheme.bodyMedium
+                                        ?.copyWith(
+                                      color: context.colors.error,
+                                    ),
+                                  ),
+                                );
+                              },
                             ),
                             const SizedBox(height: 32),
                             PressableScale(
@@ -394,4 +501,16 @@ class _InfoChip extends StatelessWidget {
       ),
     );
   }
+}
+
+String _initialsFromName(String name) {
+  final trimmed = name.trim();
+  if (trimmed.isEmpty) return '🙂';
+  final parts = trimmed.split(RegExp(r'\s+'));
+  if (parts.length == 1) {
+    return parts.first.substring(0, 1).toUpperCase();
+  }
+  final String first = parts.first.substring(0, 1).toUpperCase();
+  final String last = parts.last.substring(0, 1).toUpperCase();
+  return '$first$last';
 }

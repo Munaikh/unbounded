@@ -3,6 +3,7 @@ import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:apparence_kit/modules/events/event_card.dart';
 import 'package:apparence_kit/modules/events/providers/all_events_provider.dart';
+import 'package:apparence_kit/modules/events/providers/event_attendees_provider.dart';
 import 'package:apparence_kit/modules/events/providers/user_joined_events_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,6 +16,10 @@ class EventsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final eventsAsync = ref.watch(allEventsProvider);
     final joinedEventsAsync = ref.watch(userJoinedEventsProvider);
+    final Set<String> joinedIds = joinedEventsAsync.maybeWhen(
+      data: (events) => events.map((e) => e.id).toSet(),
+      orElse: () => <String>{},
+    );
     
     return Scaffold(
       backgroundColor: context.colors.background,
@@ -52,18 +57,30 @@ class EventsPage extends ConsumerWidget {
                           final displayDate = e.date != null
                               ? '${e.date!.toLocal()}'
                               : '';
+                          final attendeesAsync = ref.watch(
+                            eventAttendeesProvider(e.id),
+                          );
+                          final participants = attendeesAsync.maybeWhen(
+                            data: (users) => users
+                                .map((u) => _initialsFromName(u.name ?? ''))
+                                .take(3)
+                                .toList(),
+                            orElse: () => const <String>[],
+                          );
                           return EventCard(
                             title: e.title,
                             description: e.description,
                             date: displayDate,
                             location: e.location ?? '',
-                            statusLabel: 'Attending',
+                            statusLabel: 'Joined',
                             gradientColors: const [
                               Color(0xFF6DD5FA),
                               Color(0xFF2980B9),
                               Color(0xFF1E3C72),
                             ],
-                            participants: const ['AA', 'MA', 'KH'],
+                            participants: participants.isEmpty
+                                ? const ['AA', 'MA', 'KH']
+                                : participants,
                             onTap: () => context.push('/events/${e.id}'),
                           );
                         },
@@ -101,18 +118,31 @@ class EventsPage extends ConsumerWidget {
                       final displayDate = e.date != null
                           ? '${e.date!.toLocal()}'
                           : '';
+                      final bool isJoined = joinedIds.contains(e.id);
+                      final attendeesAsync = ref.watch(
+                        eventAttendeesProvider(e.id),
+                      );
+                      final participants = attendeesAsync.maybeWhen(
+                        data: (users) => users
+                            .map((u) => _initialsFromName(u.name ?? ''))
+                            .take(3)
+                            .toList(),
+                        orElse: () => const <String>[],
+                      );
                       return EventCard(
                         title: e.title,
                         description: e.description,
                         date: displayDate,
                         location: e.location ?? '',
-                        statusLabel: 'Invited',
+                        statusLabel: isJoined ? 'Joined' : 'Invited',
                         gradientColors: const [
                           Color(0xFFBFA8FF),
                           Color(0xFF6857C9),
                           Color(0xFF4B35F2),
                         ],
-                        participants: const ['AA', 'MA', 'KH'],
+                        participants: participants.isEmpty
+                            ? const ['AA', 'MA', 'KH']
+                            : participants,
                         onTap: () => context.push('/events/${e.id}'),
                       );
                     },
@@ -180,4 +210,16 @@ class EventsPage extends ConsumerWidget {
       ),
     );
   }
+}
+
+String _initialsFromName(String name) {
+  final trimmed = name.trim();
+  if (trimmed.isEmpty) return '🙂';
+  final parts = trimmed.split(RegExp(r'\s+'));
+  if (parts.length == 1) {
+    return parts.first.substring(0, 1).toUpperCase();
+  }
+  final String first = parts.first.substring(0, 1).toUpperCase();
+  final String last = parts.last.substring(0, 1).toUpperCase();
+  return '$first$last';
 }
