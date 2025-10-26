@@ -3,6 +3,8 @@ import 'package:apparence_kit/core/shared_preferences/user_preferences_provider.
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:apparence_kit/core/widgets/toast.dart';
+import 'package:apparence_kit/modules/activities/entity/tag_entity.dart';
+import 'package:apparence_kit/modules/activities/providers/all_tags_provider.dart';
 import 'package:apparence_kit/modules/activities/providers/filtered_activities_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -93,33 +95,67 @@ class _PersonalizationWizardState extends ConsumerState<PersonalizationWizard> {
 
   @override
   Widget build(BuildContext context) {
+    final tagsAsync = ref.watch(allTagsProvider);
+
     return Scaffold(
       backgroundColor: context.colors.background,
       body: SafeArea(
         bottom: false,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: _buildProgressIndicator(),
-            ),
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
-                onPageChanged: (page) {
-                  setState(() {
-                    _currentPage = page;
-                  });
-                },
-                children: [_buildGroupSizePage(), _buildBudgetPage(), _buildActivityTypePage()],
+        child: tagsAsync.when(
+          data: (tags) {
+            final activityTypeTags = _getActivityTypeTags(tags);
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                  child: _buildProgressIndicator(),
+                ),
+                Expanded(
+                  child: PageView(
+                    controller: _pageController,
+                    physics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (page) {
+                      setState(() {
+                        _currentPage = page;
+                      });
+                    },
+                    children: [
+                      _buildGroupSizePage(),
+                      _buildBudgetPage(),
+                      _buildActivityTypePage(activityTypeTags),
+                    ],
+                  ),
+                ),
+                _buildBottomButtons(),
+              ],
+            );
+          },
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (error, stack) => Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Text(
+                'Error loading tags: $error',
+                style: context.textTheme.bodyMedium,
+                textAlign: TextAlign.center,
               ),
             ),
-            _buildBottomButtons(),
-          ],
+          ),
         ),
       ),
     );
+  }
+
+  List<TagEntity> _getActivityTypeTags(List<TagEntity> allTags) {
+    // Define the primary activity types we want to show
+    final primaryTypes = ['Arcade', 'Food', 'Karaoke', 'Puzzle', 'Sport', 'Other'];
+
+    return allTags.where((tag) => primaryTypes.contains(tag.name)).toList()..sort((a, b) {
+      // Sort by the order in primaryTypes list
+      final aIndex = primaryTypes.indexOf(a.name);
+      final bIndex = primaryTypes.indexOf(b.name);
+      return aIndex.compareTo(bIndex);
+    });
   }
 
   Widget _buildProgressIndicator() {
@@ -274,7 +310,24 @@ class _PersonalizationWizardState extends ConsumerState<PersonalizationWizard> {
     );
   }
 
-  Widget _buildActivityTypePage() {
+  Widget _buildActivityTypePage(List<TagEntity> activityTypeTags) {
+    // Map tag names to emojis
+    final tagEmojis = {
+      'Arcade': '🎮',
+      'Food': '🍕',
+      'Karaoke': '🎵',
+      'Puzzle': '🧩',
+      'Sport': '🏈',
+      'Other': '➡️',
+    };
+
+    // Split tags into rows of 3
+    final rows = <List<TagEntity>>[];
+    for (var i = 0; i < activityTypeTags.length; i += 3) {
+      final end = (i + 3 < activityTypeTags.length) ? i + 3 : activityTypeTags.length;
+      rows.add(activityTypeTags.sublist(i, end));
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -293,26 +346,27 @@ class _PersonalizationWizardState extends ConsumerState<PersonalizationWizard> {
             ),
           ),
           const SizedBox(height: 48),
-          Row(
-            children: [
-              Expanded(child: _buildActivityTypeOption('🎮', 'Arcade')),
-              const SizedBox(width: 12),
-              Expanded(child: _buildActivityTypeOption('🍕', 'Food')),
-              const SizedBox(width: 12),
-              Expanded(child: _buildActivityTypeOption('🎵', 'Karaoke')),
-            ],
-          ),
+          ...rows.map((row) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  for (var i = 0; i < row.length; i++) ...[
+                    if (i > 0) const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildActivityTypeOption(tagEmojis[row[i].name] ?? '🎯', row[i].name),
+                    ),
+                  ],
+                  // Add empty spaces if the row has fewer than 3 items
+                  for (var i = row.length; i < 3; i++) ...[
+                    const SizedBox(width: 12),
+                    const Expanded(child: SizedBox()),
+                  ],
+                ],
+              ),
+            );
+          }),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(child: _buildActivityTypeOption('🧩', 'Puzzle')),
-              const SizedBox(width: 12),
-              Expanded(child: _buildActivityTypeOption('🏈', 'Sport')),
-              const SizedBox(width: 12),
-              Expanded(child: _buildActivityTypeOption('➡️', 'Other')),
-            ],
-          ),
-          const SizedBox(height: 24),
           GestureDetector(
             onTap: () {
               setState(() {
