@@ -58,5 +58,54 @@ class EventParticipantsApi {
       );
     }
   }
+
+  Future<bool> isUserJoined({
+    required String eventId,
+    required String userId,
+  }) async {
+    try {
+      final List<dynamic> response = await client
+          .from(tableName)
+          .select('id')
+          .eq('event_id', eventId)
+          .eq('user_id', userId)
+          .limit(1);
+      return response.isNotEmpty;
+    } catch (e, stacktrace) {
+      throw ApiError(
+        code: 0,
+        message: 'Error checking participation: $e: $stacktrace',
+      );
+    }
+  }
+
+  Future<void> joinEvent({
+    required String eventId,
+    required String userId,
+  }) async {
+    try {
+      await client.from(tableName).upsert({
+        'event_id': eventId,
+        'user_id': userId,
+      }, onConflict: 'event_id,user_id');
+    } catch (e, stacktrace) {
+      throw ApiError(code: 0, message: 'Error joining event: $e: $stacktrace');
+    }
+  }
+
+  Future<void> leaveEvent({
+    required String eventId,
+    required String userId,
+  }) async {
+    try {
+      await client
+          .from(tableName)
+          .delete()
+          .eq('event_id', eventId)
+          .eq('user_id', userId);
+    } catch (e, stacktrace) {
+      throw ApiError(code: 0, message: 'Error leaving event: $e: $stacktrace');
+    }
+  }
 }
 

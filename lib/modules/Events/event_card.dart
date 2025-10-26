@@ -10,7 +10,10 @@ class EventCard extends StatelessWidget {
   final String statusLabel;
   final List<Color> gradientColors;
   final List<String> participants;
+  final VoidCallback? onTap;
+  
   const EventCard({
+    super.key,
     required this.title,
     required this.date,
     required this.location,
@@ -18,11 +21,14 @@ class EventCard extends StatelessWidget {
     required this.statusLabel,
     required this.gradientColors,
     required this.participants,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       width: (MediaQuery.of(context).size.width) * .70,
       decoration: ShapeDecoration(
         shape: RoundedSuperellipseBorder(
@@ -157,6 +163,7 @@ class EventCard extends StatelessWidget {
             ],
           ),
         ],
+      ),
       ),
     );
   }

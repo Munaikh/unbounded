@@ -64,6 +64,7 @@ class EventsPage extends ConsumerWidget {
                               Color(0xFF1E3C72),
                             ],
                             participants: const ['AA', 'MA', 'KH'],
+                            onTap: () => context.push('/events/${e.id}'),
                           );
                         },
                       ),
@@ -112,6 +113,7 @@ class EventsPage extends ConsumerWidget {
                           Color(0xFF4B35F2),
                         ],
                         participants: const ['AA', 'MA', 'KH'],
+                        onTap: () => context.push('/events/${e.id}'),
                       );
                     },
                   ),
