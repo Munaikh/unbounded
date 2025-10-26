@@ -86,9 +86,7 @@ class EventsPage extends ConsumerWidget {
                               Color(0xFF2980B9),
                               Color(0xFF1E3C72),
                             ],
-                            participants: participants.isEmpty
-                                ? const ['AA', 'MA', 'KH']
-                                : participants,
+                            participants: participants,
                             backgroundImageUrl: e.bgUrl,
                             creatorName: creatorName,
                             onTap: () => context.push('/events/${e.id}'),
@@ -157,9 +155,7 @@ class EventsPage extends ConsumerWidget {
                           Color(0xFF6857C9),
                           Color(0xFF4B35F2),
                         ],
-                        participants: participants.isEmpty
-                            ? const ['AA', 'MA', 'KH']
-                            : participants,
+                        participants: participants,
                         backgroundImageUrl: e.bgUrl,
                         creatorName: creatorName,
                         onTap: () => context.push('/events/${e.id}'),
