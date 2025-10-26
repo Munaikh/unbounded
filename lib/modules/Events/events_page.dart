@@ -1,11 +1,10 @@
-import 'package:apparence_kit/core/data/models/user.dart';
-import 'package:apparence_kit/core/states/user_state_notifier.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:apparence_kit/modules/events/event_card.dart';
 import 'package:apparence_kit/modules/events/providers/all_events_provider.dart';
 import 'package:apparence_kit/modules/events/providers/event_attendees_provider.dart';
+import 'package:apparence_kit/modules/events/providers/event_creator_provider.dart';
 import 'package:apparence_kit/modules/events/providers/user_joined_events_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -18,23 +17,6 @@ class EventsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final eventsAsync = ref.watch(allEventsProvider);
     final joinedEventsAsync = ref.watch(userJoinedEventsProvider);
-    final userState = ref.watch(userStateNotifierProvider);
-    final currentUserName = userState.user.when(
-      authenticated:
-          (
-            email,
-            name,
-            id,
-            creationDate,
-            lastUpdateDate,
-            avatarPath,
-            onboarded,
-            subscription,
-          ) => name,
-      anonymous: (id, onboarded, subscription, creationDate, lastUpdateDate) =>
-          null,
-      loading: () => null,
-    );
     final Set<String> joinedIds = joinedEventsAsync.maybeWhen(
       data: (events) => events.map((e) => e.id).toSet(),
       orElse: () => <String>{},
@@ -86,6 +68,13 @@ class EventsPage extends ConsumerWidget {
                                 .toList(),
                             orElse: () => const <String>[],
                           );
+                          final creatorAsync = ref.watch(
+                            eventCreatorProvider(e.owner),
+                          );
+                          final creatorName = creatorAsync.maybeWhen(
+                            data: (user) => user?.name,
+                            orElse: () => null,
+                          );
                           return EventCard(
                             title: e.title,
                             description: e.description,
@@ -101,7 +90,7 @@ class EventsPage extends ConsumerWidget {
                                 ? const ['AA', 'MA', 'KH']
                                 : participants,
                             backgroundImageUrl: e.bgUrl,
-                            creatorName: currentUserName,
+                            creatorName: creatorName,
                             onTap: () => context.push('/events/${e.id}'),
                           );
                         },
@@ -150,6 +139,13 @@ class EventsPage extends ConsumerWidget {
                             .toList(),
                         orElse: () => const <String>[],
                       );
+                      final creatorAsync = ref.watch(
+                        eventCreatorProvider(e.owner),
+                      );
+                      final creatorName = creatorAsync.maybeWhen(
+                        data: (user) => user?.name,
+                        orElse: () => null,
+                      );
                       return EventCard(
                         title: e.title,
                         description: e.description,
@@ -165,7 +161,7 @@ class EventsPage extends ConsumerWidget {
                             ? const ['AA', 'MA', 'KH']
                             : participants,
                         backgroundImageUrl: e.bgUrl,
-                        creatorName: currentUserName,
+                        creatorName: creatorName,
                         onTap: () => context.push('/events/${e.id}'),
                       );
                     },

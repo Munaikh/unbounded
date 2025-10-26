@@ -266,7 +266,7 @@ class EventCard extends StatelessWidget {
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
-                          vertical: 16,
+                          vertical: 14,
                         ),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
@@ -300,7 +300,7 @@ class EventCard extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 6),
                             Text(
                               description,
                               maxLines: 2,
@@ -312,7 +312,7 @@ class EventCard extends StatelessWidget {
                               ),
                             ),
                             if (date.isNotEmpty || location.isNotEmpty) ...[
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 8),
                               Container(
                                 height: 1,
                                 decoration: BoxDecoration(
@@ -325,7 +325,7 @@ class EventCard extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 10),
+                              const SizedBox(height: 8),
                             ],
                             if (date.isNotEmpty)
                               Row(
@@ -385,7 +385,7 @@ class EventCard extends StatelessWidget {
                     ),
                 ),
               ),
-              const SizedBox(height: 24),
+                const SizedBox(height: 20),
             ],
           ),
         ],

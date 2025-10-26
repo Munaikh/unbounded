@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:apparence_kit/core/data/api/user_api.dart';
 import 'package:apparence_kit/core/data/entities/user_entity.dart';
 import 'package:apparence_kit/core/data/models/user.dart';
@@ -156,48 +158,58 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
     }
   }
 
+  String _getInitials(String name) {
+    final trimmed = name.trim();
+    if (trimmed.isEmpty) return 'E';
+    final parts = trimmed.split(RegExp(r'\s+'));
+    if (parts.length == 1) {
+      return parts.first.substring(0, 1).toUpperCase();
+    }
+    final String first = parts.first.substring(0, 1).toUpperCase();
+    final String last = parts.last.substring(0, 1).toUpperCase();
+    return '$first$last';
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: context.colors.background,
-      body: FutureBuilder(
-        future: ref.read(eventsApiProvider).getEventDetails(widget.eventId),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return FutureBuilder(
+      future: ref.read(eventsApiProvider).getEventDetails(widget.eventId),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-          if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          }
+        if (snapshot.hasError) {
+          return Scaffold(
+            body: Center(child: Text('Error: ${snapshot.error}')),
+          );
+        }
 
-          if (!snapshot.hasData) {
-            return const Center(child: Text('Event not found'));
-          }
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            body: Center(child: Text('Event not found')),
+          );
+        }
 
-          final event = snapshot.data!;
-          final double headerHeight = MediaQuery.of(context).size.height * 0.35;
+        final event = snapshot.data!;
 
-          return CustomScrollView(
-            slivers: [
-              SliverAppBar(
-                expandedHeight: headerHeight,
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-                automaticallyImplyLeading: false,
-                flexibleSpace: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    if (event.bgUrl != null && event.bgUrl!.isNotEmpty)
-                      Image.network(
+        return Scaffold(
+          body: Stack(
+            children: [
+              // Full-page background
+              Positioned.fill(
+                child: event.bgUrl != null && event.bgUrl!.isNotEmpty
+                    ? Image.network(
                         event.bgUrl!,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
                           return Container(
                             decoration: const BoxDecoration(
                               gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
                                 colors: [
                                   Color(0xFFBFA8FF),
                                   Color(0xFF6857C9),
@@ -208,12 +220,11 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                           );
                         },
                       )
-                    else
-                      Container(
+                    : Container(
                         decoration: const BoxDecoration(
                           gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                             colors: [
                               Color(0xFFBFA8FF),
                               Color(0xFF6857C9),
@@ -222,243 +233,407 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                           ),
                         ),
                       ),
-                    Center(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: context.colors.shadow.withCustomOpacity(
-                                0.10,
-                              ),
-                              blurRadius: 16,
-                              offset: const Offset(0, 10),
-                            ),
-                          ],
-                        ),
-                        child: CircleAvatar(
-                          radius: 60,
-                          backgroundColor: Colors.white.withCustomOpacity(.3),
-                          child: Text(
-                            'KH',
-                            style: context.textTheme.displaySmall?.copyWith(
-                              color: Colors.black87,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                      ),
+              ),
+              // Dark overlay for better readability
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.3),
+                        Colors.black.withValues(alpha: 0.7),
+                      ],
                     ),
-                    SafeArea(
-                      child: Align(
-                        alignment: Alignment.topLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.only(left: 8, top: 8),
-                          child: IconButton(
+                  ),
+                ),
+              ),
+              // Content
+              SafeArea(
+                child: Column(
+                  children: [
+                    // Header with back button
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        children: [
+                          IconButton(
                             onPressed: () => Navigator.of(context).maybePop(),
-                            icon: Icon(
+                            icon: const Icon(
                               Icons.arrow_back_ios_new_rounded,
-                              color: context.colors.onPrimary,
+                              color: Colors.white,
                             ),
                             splashColor: Colors.transparent,
                             highlightColor: Colors.transparent,
                           ),
-                        ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
-              SliverToBoxAdapter(
-                child: SafeArea(
-                  top: false,
-                  left: false,
-                  right: false,
-                  minimum: const EdgeInsets.only(bottom: 16),
-                  child: Transform.translate(
-                    offset: const Offset(0, 20),
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                      child: Container(
-                        decoration: ShapeDecoration(
-                          shape: RoundedSuperellipseBorder(
-                            borderRadius: BorderRadius.circular(32),
-                          ),
-                          color: context.colors.surface,
-                        ),
-                        padding: const EdgeInsets.fromLTRB(20, 24, 20, 24),
+                    // Scrollable content
+                    Expanded(
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    event.title,
-                                    style: context.textTheme.headlineSmall,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            Row(
-                              children: [
-                                if (event.date != null)
-                                  _InfoChip(
-                                    label: _formatEventDate(event.date!),
-                                  ),
-                                if (event.location != null &&
-                                    event.location!.isNotEmpty) ...[
-                                  const SizedBox(width: 12),
-                                  _InfoChip(label: event.location!),
-                                ],
-                              ],
-                            ),
-                            const SizedBox(height: 16),
-                            if (event.description.isNotEmpty)
-                              Text(
-                                event.description,
-                                style: context.textTheme.bodyLarge?.copyWith(
-                                  color: context.colors.onBackground.withValues(
-                                    alpha: 0.8,
-                                  ),
-                                  height: 1.5,
-                                ),
-                              ),
-                            const SizedBox(height: 32),
-                            Text(
-                              'Participants',
-                              style: context.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            Consumer(
-                              builder: (context, ref, _) {
-                                final attendeesAsync = ref.watch(
-                                  eventAttendeesProvider(widget.eventId),
-                                );
-                                return attendeesAsync.when(
-                                  data: (users) {
-                                    if (users.isEmpty) {
-                                      return Text(
-                                        'No participants yet',
-                                        style: context.textTheme.bodyMedium
-                                            ?.copyWith(
-                                          color: context.colors.onBackground
-                                              .withCustomOpacity(0.6),
+                            const SizedBox(height: 40),
+                            // Creator avatar with glassmorphism
+                            FutureBuilder<UserEntity?>(
+                              future: ref.read(userApiProvider).get(event.owner),
+                              builder: (context, userSnapshot) {
+                                final creatorName = userSnapshot.data?.name ?? 'Event';
+                                return ClipOval(
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+                                    child: Container(
+                                      width: 120,
+                                      height: 120,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            Colors.white.withValues(alpha: 0.4),
+                                            Colors.white.withValues(alpha: 0.2),
+                                          ],
                                         ),
-                                      );
-                                    }
-                                    return Wrap(
-                                      spacing: 12,
-                                      runSpacing: 12,
-                                      children: [
-                                        for (final u in users)
-                                          CircleAvatar(
-                                            radius: 20,
-                                            backgroundColor: context.colors
-                                                .primary
-                                                .withCustomOpacity(0.15),
-                                            child: Text(
-                                              _initialsFromName(u.name ?? ''),
-                                              style: context
-                                                  .textTheme.bodyMedium
-                                                  ?.copyWith(
-                                                color:
-                                                    context.colors.primary,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(alpha: 0.3),
+                                          width: 1.5,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.2),
+                                            blurRadius: 20,
+                                            offset: const Offset(0, 10),
                                           ),
-                                      ],
-                                    );
-                                  },
-                                  loading: () => SizedBox(
-                                    height: 44,
-                                    child: Align(
-                                      alignment: Alignment.centerLeft,
-                                      child: SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
+                                        ],
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          _getInitials(creatorName),
+                                          style: context.textTheme.displaySmall?.copyWith(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w700,
+                                            shadows: [
+                                              Shadow(
+                                                color: Colors.black.withValues(alpha: 0.3),
+                                                offset: const Offset(0, 2),
+                                                blurRadius: 4,
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                  error: (e, _) => Text(
-                                    'Failed to load participants',
-                                    style: context.textTheme.bodyMedium
-                                        ?.copyWith(
-                                      color: context.colors.error,
                                     ),
                                   ),
                                 );
                               },
                             ),
                             const SizedBox(height: 32),
-                            PressableScale(
-                              child: GestureDetector(
-                                onTap: _isProcessing ? null : _toggleJoinEvent,
+                            // Event title with glassmorphism
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                                 child: Container(
                                   width: double.infinity,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 18,
-                                  ),
-                                  decoration: ShapeDecoration(
-                                    shape: RoundedSuperellipseBorder(
-                                      borderRadius: BorderRadius.circular(100),
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white.withValues(alpha: 0.25),
+                                        Colors.white.withValues(alpha: 0.15),
+                                      ],
                                     ),
-                                    color: _isProcessing
-                                        ? context.colors.primary
-                                              .withCustomOpacity(0.6)
-                                        : _isJoined
-                                        ? context.colors.error
-                                        : context.colors.primary,
+                                    borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.3),
+                                      width: 1,
+                                    ),
                                   ),
-                                  child: Center(
-                                    child: _isProcessing
-                                        ? SizedBox(
-                                            width: 24,
-                                            height: 24,
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                    context.colors.onPrimary,
-                                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        event.title,
+                                        style: context.textTheme.headlineMedium?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black.withValues(alpha: 0.3),
+                                              offset: const Offset(0, 2),
+                                              blurRadius: 4,
                                             ),
-                                          )
-                                        : Text(
-                                            _isJoined
-                                                ? 'Leave Event'
-                                                : 'Join Event',
-                                            style: context.textTheme.titleMedium
-                                                ?.copyWith(
-                                                  color:
-                                                      context.colors.onPrimary,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 20),
+                                      // Date and location chips
+                                      Wrap(
+                                        spacing: 12,
+                                        runSpacing: 12,
+                                        children: [
+                                          if (event.date != null)
+                                            _GlassInfoChip(
+                                              icon: Icons.calendar_today_rounded,
+                                              label: _formatEventDate(event.date!),
+                                            ),
+                                          if (event.location != null && event.location!.isNotEmpty)
+                                            _GlassInfoChip(
+                                              icon: Icons.location_on_rounded,
+                                              label: event.location!,
+                                            ),
+                                        ],
+                                      ),
+                                      if (event.description.isNotEmpty) ...[
+                                        const SizedBox(height: 20),
+                                        Text(
+                                          event.description,
+                                          style: context.textTheme.bodyLarge?.copyWith(
+                                            color: Colors.white.withValues(alpha: 0.95),
+                                            height: 1.6,
+                                            shadows: [
+                                              Shadow(
+                                                color: Colors.black.withValues(alpha: 0.2),
+                                                offset: const Offset(0, 1),
+                                                blurRadius: 2,
+                                              ),
+                                            ],
                                           ),
+                                        ),
+                                      ],
+                                    ],
                                   ),
                                 ),
                               ),
                             ),
+                            const SizedBox(height: 24),
+                            // Participants section with glassmorphism
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: BackdropFilter(
+                                filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(24),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white.withValues(alpha: 0.25),
+                                        Colors.white.withValues(alpha: 0.15),
+                                      ],
+                                    ),
+                                    borderRadius: BorderRadius.circular(24),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(alpha: 0.3),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Participants',
+                                        style: context.textTheme.titleLarge?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                          shadows: [
+                                            Shadow(
+                                              color: Colors.black.withValues(alpha: 0.3),
+                                              offset: const Offset(0, 2),
+                                              blurRadius: 4,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      const SizedBox(height: 16),
+                                      Consumer(
+                                        builder: (context, ref, _) {
+                                          final attendeesAsync = ref.watch(
+                                            eventAttendeesProvider(widget.eventId),
+                                          );
+                                          return attendeesAsync.when(
+                                            data: (users) {
+                                              if (users.isEmpty) {
+                                                return Text(
+                                                  'No participants yet',
+                                                  style: context.textTheme.bodyMedium?.copyWith(
+                                                    color: Colors.white.withValues(alpha: 0.7),
+                                                  ),
+                                                );
+                                              }
+                                              return Wrap(
+                                                spacing: 12,
+                                                runSpacing: 12,
+                                                children: [
+                                                  for (final u in users)
+                                                    ClipOval(
+                                                      child: BackdropFilter(
+                                                        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                                                        child: Container(
+                                                          width: 48,
+                                                          height: 48,
+                                                          decoration: BoxDecoration(
+                                                            shape: BoxShape.circle,
+                                                            gradient: LinearGradient(
+                                                              begin: Alignment.topLeft,
+                                                              end: Alignment.bottomRight,
+                                                              colors: [
+                                                                Colors.white.withValues(alpha: 0.3),
+                                                                Colors.white.withValues(alpha: 0.15),
+                                                              ],
+                                                            ),
+                                                            border: Border.all(
+                                                              color: Colors.white.withValues(alpha: 0.4),
+                                                              width: 1,
+                                                            ),
+                                                          ),
+                                                          child: Center(
+                                                            child: Text(
+                                                              _initialsFromName(u.name ?? ''),
+                                                              style: context.textTheme.bodyMedium?.copyWith(
+                                                                color: Colors.white,
+                                                                fontWeight: FontWeight.w600,
+                                                                shadows: [
+                                                                  Shadow(
+                                                                    color: Colors.black.withValues(alpha: 0.3),
+                                                                    offset: const Offset(0, 1),
+                                                                    blurRadius: 2,
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                ],
+                                              );
+                                            },
+                                            loading: () => const SizedBox(
+                                              height: 48,
+                                              child: Center(
+                                                child: SizedBox(
+                                                  width: 24,
+                                                  height: 24,
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            error: (e, _) => Text(
+                                              'Failed to load participants',
+                                              style: context.textTheme.bodyMedium?.copyWith(
+                                                color: Colors.white.withValues(alpha: 0.7),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 32),
+                            // Join/Leave button with glassmorphism
+                            PressableScale(
+                              child: GestureDetector(
+                                onTap: _isProcessing ? null : _toggleJoinEvent,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(100),
+                                  child: BackdropFilter(
+                                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 32,
+                                        vertical: 20,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: _isProcessing
+                                              ? [
+                                                  Colors.white.withValues(alpha: 0.2),
+                                                  Colors.white.withValues(alpha: 0.1),
+                                                ]
+                                              : _isJoined
+                                                  ? [
+                                                      const Color(0xFFFF6B6B).withValues(alpha: 0.8),
+                                                      const Color(0xFFEE5A6F).withValues(alpha: 0.7),
+                                                    ]
+                                                  : [
+                                                      Colors.white.withValues(alpha: 0.35),
+                                                      Colors.white.withValues(alpha: 0.25),
+                                                    ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(100),
+                                        border: Border.all(
+                                          color: Colors.white.withValues(alpha: 0.4),
+                                          width: 1.5,
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black.withValues(alpha: 0.2),
+                                            blurRadius: 16,
+                                            offset: const Offset(0, 8),
+                                          ),
+                                        ],
+                                      ),
+                                      child: Center(
+                                        child: _isProcessing
+                                            ? const SizedBox(
+                                                width: 24,
+                                                height: 24,
+                                                child: CircularProgressIndicator(
+                                                  strokeWidth: 2.5,
+                                                  color: Colors.white,
+                                                ),
+                                              )
+                                            : Text(
+                                                _isJoined ? 'Leave Event' : 'Join Event',
+                                                style: context.textTheme.titleMedium?.copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700,
+                                                  fontSize: 17,
+                                                  shadows: [
+                                                    Shadow(
+                                                      color: Colors.black.withValues(alpha: 0.3),
+                                                      offset: const Offset(0, 1),
+                                                      blurRadius: 2,
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
                           ],
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ),
-              const SliverToBoxAdapter(child: SizedBox(height: 16)),
             ],
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -478,25 +653,70 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
   }
 }
 
-class _InfoChip extends StatelessWidget {
+class _GlassInfoChip extends StatelessWidget {
+  final IconData icon;
   final String label;
-  const _InfoChip({required this.label});
+  
+  const _GlassInfoChip({
+    required this.icon,
+    required this.label,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: ShapeDecoration(
-        shape: RoundedSuperellipseBorder(
-          borderRadius: BorderRadius.circular(100),
-        ),
-        color: context.colors.primary.withCustomOpacity(0.10),
-      ),
-      child: Text(
-        label,
-        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-          color: context.colors.primary,
-          fontWeight: FontWeight.w600,
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(100),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                Colors.white.withValues(alpha: 0.3),
+                Colors.white.withValues(alpha: 0.2),
+              ],
+            ),
+            borderRadius: BorderRadius.circular(100),
+            border: Border.all(
+              color: Colors.white.withValues(alpha: 0.4),
+              width: 1,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: 16,
+                color: Colors.white,
+                shadows: [
+                  Shadow(
+                    color: Colors.black.withValues(alpha: 0.3),
+                    offset: const Offset(0, 1),
+                    blurRadius: 2,
+                  ),
+                ],
+              ),
+              const SizedBox(width: 8),
+              Text(
+                label,
+                style: context.textTheme.bodyMedium?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black.withValues(alpha: 0.3),
+                      offset: const Offset(0, 1),
+                      blurRadius: 2,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
