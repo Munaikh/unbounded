@@ -124,7 +124,6 @@ class HomePage extends ConsumerWidget {
                           style: context.textTheme.bodySmall?.copyWith(
                             color: context.colors.primary,
                             fontWeight: FontWeight.w600,
-                            decoration: TextDecoration.underline,
                           ),
                         ),
                       ),

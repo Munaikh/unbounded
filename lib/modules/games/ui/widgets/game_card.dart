@@ -11,11 +11,11 @@ class GameCard extends StatelessWidget {
 
   Color _getCategoryColor(GameCategory category) {
     return switch (category) {
-      GameCategory.social => const Color(0xFF6C63FF),
-      GameCategory.trivia => const Color(0xFFFF6B6B),
-      GameCategory.drawing => const Color(0xFF4ECDC4),
-      GameCategory.party => const Color(0xFFFFE66D),
-      GameCategory.strategy => const Color(0xFF95E1D3),
+      GameCategory.social => Colors.blue,
+      GameCategory.trivia => Colors.red,
+      GameCategory.drawing => Colors.green,
+      GameCategory.party => Colors.orange,
+      GameCategory.strategy => Colors.purple,
     };
   }
 
@@ -40,13 +40,6 @@ class GameCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: context.colors.surface,
-          boxShadow: [
-            BoxShadow(
-              color: context.colors.shadow.withValues(alpha: 0.08),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(20),
@@ -60,18 +53,18 @@ class GameCard extends StatelessWidget {
                     Row(
                       children: [
                         // Emoji
-                        Container(
-                          width: 60,
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: categoryColor.withValues(alpha: 0.15),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Center(
-                            child: Text(game.emoji, style: const TextStyle(fontSize: 32)),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
+                        // Container(
+                        //   width: 60,
+                        //   height: 60,
+                        //   decoration: BoxDecoration(
+                        //     color: categoryColor.withValues(alpha: 0.15),
+                        //     borderRadius: BorderRadius.circular(16),
+                        //   ),
+                        //   child: Center(
+                        //     child: Text(game.emoji, style: const TextStyle(fontSize: 32)),
+                        //   ),
+                        // ),
+                        // const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -101,6 +94,34 @@ class GameCard extends StatelessWidget {
                             ],
                           ),
                         ),
+                        if (game.website != null) ...[
+                          const SizedBox(height: 12),
+                          GestureDetector(
+                            onTap: () async {
+                              final url = Uri.parse(game.website!);
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url, mode: LaunchMode.externalApplication);
+                              }
+                            },
+                            child: Row(
+                              children: [
+                                const Icon(
+                                  Icons.language,
+                                  size: 16,
+                                  // color: categoryColor,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Visit Website',
+                                  style: context.textTheme.labelMedium?.copyWith(
+                                    // color: categoryColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ],
                     ),
                     const SizedBox(height: 12),
@@ -142,36 +163,6 @@ class GameCard extends StatelessWidget {
                             ),
                           );
                         }).toList(),
-                      ),
-                    ],
-                    if (game.website != null) ...[
-                      const SizedBox(height: 12),
-                      GestureDetector(
-                        onTap: () async {
-                          final url = Uri.parse(game.website!);
-                          if (await canLaunchUrl(url)) {
-                            await launchUrl(url, mode: LaunchMode.externalApplication);
-                          }
-                        },
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.language,
-                              size: 16,
-                              // color: categoryColor,
-                            ),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                'Visit Website',
-                                style: context.textTheme.labelMedium?.copyWith(
-                                  // color: categoryColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
                     ],
                   ],
