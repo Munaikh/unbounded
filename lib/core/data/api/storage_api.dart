@@ -8,7 +8,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 final storageApiProvider = Provider<StorageApi>(
   (ref) => SupabaseStorageApi(
     client: Supabase.instance.client,
-    storageBucket: 'apparencekit', // TODO : replace with your storage bucket
+    storageBucket: 'events',
   ),
 );
 
@@ -71,12 +71,13 @@ class SupabaseStorageApi implements StorageApi {
         imagePath: result,
         imagePublicUrl: '',
       );
+      return;
     }
     // wait a bit to be sure the file is uploaded (could fire error if too fast)
     await Future.delayed(const Duration(seconds: 1));
-    final publicUrl = await _client.storage
+    final publicUrl = _client.storage
         .from(_storageBucket) //
-        .createSignedUrl(path, 0);
+        .getPublicUrl(path);
     yield UploadResultCompleted(
       imagePath: result,
       imagePublicUrl: publicUrl,

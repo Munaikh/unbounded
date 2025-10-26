@@ -1,12 +1,18 @@
 import 'dart:ui';
 
+import 'package:apparence_kit/core/data/api/image.dart';
+import 'package:apparence_kit/core/data/api/storage_api.dart';
+import 'package:apparence_kit/core/data/entities/upload_result.dart';
+import 'package:apparence_kit/core/states/user_state_notifier.dart';
 import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:apparence_kit/core/widgets/toast.dart';
 import 'package:apparence_kit/modules/events/api/events_api.dart';
+import 'package:apparence_kit/modules/events/providers/all_events_provider.dart';
 import 'package:apparence_kit/modules/events/ui/unsplash_image_picker.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -28,6 +34,8 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   DateTime? _date;
   bool _isCreating = false;
   String? _backgroundImageUrl;
+  bool _isUploadingImage = false;
+  double _uploadProgress = 0.0;
 
   @override
   void dispose() {
@@ -159,11 +167,67 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   Future<void> _pickFromGallery() async {
     final picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      // TODO: Upload to storage and get URL
-      ref
-          .read(toastProvider)
-          .error(title: 'Not Implemented', text: 'Gallery image upload not yet implemented');
+    if (image == null) return;
+
+    setState(() {
+      _isUploadingImage = true;
+      _uploadProgress = 0.0;
+    });
+
+    try {
+      final userState = ref.read(userStateNotifierProvider);
+      final userId = userState.user.idOrThrow;
+      final storageApi = ref.read(storageApiProvider);
+
+      // Read image bytes
+      final bytes = await image.readAsBytes();
+
+      // Resize and compress image
+      final jpegData = await compute(
+        imgToJpeg,
+        JpegParams(data: bytes, maxWidth: 1200, quality: 85),
+      );
+
+      // Generate unique filename
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final filename = 'event_$timestamp.jpg';
+
+      // Upload to storage
+      final uploadStream = storageApi.uploadData(
+        jpegData,
+        'events/$userId',
+        filename,
+        mimeType: 'image/jpeg',
+      );
+
+      await for (final result in uploadStream) {
+        if (result case UploadResultProgress(:final progress)) {
+          setState(() {
+            _uploadProgress = progress;
+          });
+        } else if (result case UploadResultCompleted(:final imagePublicUrl)) {
+          if (mounted) {
+            setState(() {
+              _backgroundImageUrl = imagePublicUrl;
+              _isUploadingImage = false;
+            });
+            ref.read(toastProvider).success(
+                  title: 'Image Uploaded',
+                  text: 'Background image uploaded successfully',
+                );
+          }
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _isUploadingImage = false;
+        });
+        ref.read(toastProvider).error(
+              title: 'Upload Failed',
+              text: 'Failed to upload image: $e',
+            );
+      }
     }
   }
 
@@ -330,15 +394,17 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                   const SizedBox(height: 24),
                   PressableScale(
                     child: GestureDetector(
-                      onTap: _showImageSourceOptions,
+                      onTap: _isUploadingImage ? null : _showImageSourceOptions,
                       behavior: HitTestBehavior.opaque,
                       child: Container(
                         height: 56,
                         decoration: ShapeDecoration(
                           shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
-                          color: _backgroundImageUrl != null
-                              ? Colors.white.withValues(alpha: 0.2)
-                              : context.colors.error.withCustomOpacity(0.8),
+                          color: _isUploadingImage
+                              ? context.colors.primary.withCustomOpacity(0.6)
+                              : _backgroundImageUrl != null
+                                  ? Colors.white.withValues(alpha: 0.2)
+                                  : context.colors.error.withCustomOpacity(0.8),
                           shadows: [
                             BoxShadow(
                               color: context.colors.shadow.withCustomOpacity(0.12),
@@ -348,13 +414,36 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           ],
                         ),
                         alignment: Alignment.center,
-                        child: Text(
-                          _backgroundImageUrl != null ? 'Change Background' : 'Add Background',
-                          style: context.textTheme.titleMedium?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                        child: _isUploadingImage
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+                                      value: _uploadProgress,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'Uploading ${(_uploadProgress * 100).toInt()}%',
+                                    style: context.textTheme.titleMedium?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            : Text(
+                                _backgroundImageUrl != null ? 'Change Background' : 'Add Background',
+                                style: context.textTheme.titleMedium?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ),
                   ),
@@ -630,17 +719,27 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       );
 
       if (mounted) {
+        // Invalidate events provider to refresh the list
+        ref.invalidate(allEventsProvider);
+        
         // Show success message
         ref
             .read(toastProvider)
-            .success(title: 'Event created successfully!', text: 'Event created successfully!');
+            .success(title: 'Event Created', text: 'Your event has been created successfully!');
+        
+        // Dismiss the create event page
+        Navigator.of(context).pop();
       }
     } catch (e) {
-      ref.read(toastProvider).error(title: 'Error', text: 'Failed to create event: $e');
+      if (mounted) {
+        ref.read(toastProvider).error(title: 'Error', text: 'Failed to create event: $e');
+      }
     } finally {
-      setState(() {
-        _isCreating = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isCreating = false;
+        });
+      }
     }
   }
 }

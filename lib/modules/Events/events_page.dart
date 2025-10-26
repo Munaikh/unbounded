@@ -1,3 +1,5 @@
+import 'package:apparence_kit/core/data/models/user.dart';
+import 'package:apparence_kit/core/states/user_state_notifier.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
@@ -16,6 +18,23 @@ class EventsPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final eventsAsync = ref.watch(allEventsProvider);
     final joinedEventsAsync = ref.watch(userJoinedEventsProvider);
+    final userState = ref.watch(userStateNotifierProvider);
+    final currentUserName = userState.user.when(
+      authenticated:
+          (
+            email,
+            name,
+            id,
+            creationDate,
+            lastUpdateDate,
+            avatarPath,
+            onboarded,
+            subscription,
+          ) => name,
+      anonymous: (id, onboarded, subscription, creationDate, lastUpdateDate) =>
+          null,
+      loading: () => null,
+    );
     final Set<String> joinedIds = joinedEventsAsync.maybeWhen(
       data: (events) => events.map((e) => e.id).toSet(),
       orElse: () => <String>{},
@@ -81,6 +100,8 @@ class EventsPage extends ConsumerWidget {
                             participants: participants.isEmpty
                                 ? const ['AA', 'MA', 'KH']
                                 : participants,
+                            backgroundImageUrl: e.bgUrl,
+                            creatorName: currentUserName,
                             onTap: () => context.push('/events/${e.id}'),
                           );
                         },
@@ -143,6 +164,8 @@ class EventsPage extends ConsumerWidget {
                         participants: participants.isEmpty
                             ? const ['AA', 'MA', 'KH']
                             : participants,
+                        backgroundImageUrl: e.bgUrl,
+                        creatorName: currentUserName,
                         onTap: () => context.push('/events/${e.id}'),
                       );
                     },

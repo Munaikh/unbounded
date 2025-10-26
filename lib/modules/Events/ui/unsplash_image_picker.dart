@@ -1,3 +1,4 @@
+import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,20 @@ class _UnsplashImagePickerState extends State<UnsplashImagePicker> {
   bool _isLoading = false;
   final _searchController = TextEditingController();
   String _lastQuery = 'Patterns';
+  String? _selectedTheme;
+
+  static const List<Map<String, dynamic>> _themeChips = [
+    {'label': '🎃 Halloween', 'query': 'Halloween party decorations'},
+    {'label': '🎄 Christmas', 'query': 'Christmas festive celebration'},
+    {'label': '🎂 Birthday', 'query': 'Birthday party celebration'},
+    {'label': '💍 Wedding', 'query': 'Wedding ceremony elegant'},
+    {'label': '🎓 Graduation', 'query': 'Graduation celebration'},
+    {'label': '🎉 Party', 'query': 'Party celebration fun'},
+    {'label': '🌸 Spring', 'query': 'Spring flowers nature'},
+    {'label': '☀️ Summer', 'query': 'Summer beach vacation'},
+    {'label': '🍂 Autumn', 'query': 'Autumn fall colors'},
+    {'label': '❄️ Winter', 'query': 'Winter snow landscape'},
+  ];
 
   @override
   void initState() {
@@ -98,8 +113,10 @@ class _UnsplashImagePickerState extends State<UnsplashImagePicker> {
         backgroundColor: context.colors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.close, color: context.colors.onSurface),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: context.colors.onSurface),
           onPressed: () => Navigator.of(context).pop(),
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
         ),
         title: Text(
           'Choose Background',
@@ -113,42 +130,108 @@ class _UnsplashImagePickerState extends State<UnsplashImagePicker> {
         children: [
           // Search bar
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
             color: context.colors.surface,
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search for images...',
-                hintStyle: context.textTheme.bodyMedium?.copyWith(
-                  color: context.colors.onSurface.withValues(alpha: 0.4),
+            child: Container(
+              clipBehavior: Clip.hardEdge,
+              decoration: ShapeDecoration(
+                shape: RoundedSuperellipseBorder(
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: context.colors.onSurface.withValues(alpha: 0.6),
-                ),
-                suffixIcon: _searchController.text.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(
-                          Icons.clear,
-                          color: context.colors.onSurface.withValues(alpha: 0.6),
-                        ),
-                        onPressed: () {
-                          _searchController.clear();
-                          setState(() {});
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: context.colors.background,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                color: context.colors.background,
               ),
-              onSubmitted: _searchPhotos,
-              onChanged: (value) {
-                setState(() {});
+              child: TextField(
+                controller: _searchController,
+                decoration: InputDecoration(
+                  hintText: 'Search for images...',
+                  hintStyle: context.textTheme.bodyMedium?.copyWith(
+                    color: context.colors.onSurface.withCustomOpacity(0.4),
+                  ),
+                  prefixIcon: Icon(
+                    Icons.search,
+                    color: context.colors.onSurface.withCustomOpacity(0.6),
+                  ),
+                  suffixIcon: _searchController.text.isNotEmpty
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.clear,
+                            color: context.colors.onSurface.withCustomOpacity(0.6),
+                          ),
+                          onPressed: () {
+                            _searchController.clear();
+                            setState(() {
+                              _selectedTheme = null;
+                            });
+                          },
+                        )
+                      : null,
+                  border: InputBorder.none,
+                  enabledBorder: InputBorder.none,
+                  focusedBorder: InputBorder.none,
+                  errorBorder: InputBorder.none,
+                  focusedErrorBorder: InputBorder.none,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 16,
+                  ),
+                ),
+                onSubmitted: (value) {
+                  _searchPhotos(value);
+                  setState(() {
+                    _selectedTheme = null;
+                  });
+                },
+                onChanged: (value) {
+                  setState(() {});
+                },
+              ),
+            ),
+          ),
+          // Theme chips
+          Container(
+            height: 50,
+            color: context.colors.surface,
+            padding: const EdgeInsets.only(bottom: 12),
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: _themeChips.length,
+              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              itemBuilder: (context, index) {
+                final theme = _themeChips[index];
+                final isSelected = _selectedTheme == theme['label'];
+                return PressableScale(
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedTheme = theme['label'] as String;
+                      });
+                      _searchPhotos(theme['query'] as String);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      decoration: ShapeDecoration(
+                        shape: RoundedSuperellipseBorder(
+                          borderRadius: BorderRadius.circular(100),
+                        ),
+                        color: isSelected
+                            ? context.colors.primary
+                            : context.colors.background,
+                      ),
+                      child: Center(
+                        child: Text(
+                          theme['label'] as String,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: isSelected
+                                ? context.colors.onPrimary
+                                : context.colors.onSurface,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               },
             ),
           ),
@@ -196,17 +279,19 @@ class _UnsplashImagePickerState extends State<UnsplashImagePicker> {
                             Navigator.of(context).pop(photo.urls.regular.toString());
                           },
                           child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
+                            decoration: ShapeDecoration(
+                              shape: RoundedSuperellipseBorder(
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              shadows: [
                                 BoxShadow(
-                                  color: context.colors.shadow.withValues(alpha: 0.1),
+                                  color: context.colors.shadow.withCustomOpacity(0.1),
                                   blurRadius: 8,
                                   offset: const Offset(0, 4),
                                 ),
                               ],
                             ),
-                            clipBehavior: Clip.antiAlias,
+                            clipBehavior: Clip.hardEdge,
                             child: Stack(
                               fit: StackFit.expand,
                               children: [
