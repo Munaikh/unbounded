@@ -7,6 +7,7 @@ import 'package:apparence_kit/modules/activities/entity/tag_entity.dart';
 import 'package:apparence_kit/modules/activities/providers/all_tags_provider.dart';
 import 'package:apparence_kit/modules/activities/providers/filtered_activities_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:cupertino_native/cupertino_native.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -285,24 +286,16 @@ class _PersonalizationWizardState extends ConsumerState<PersonalizationWizard> {
             ),
           ),
           const SizedBox(height: 40),
-          SliderTheme(
-            data: SliderThemeData(
-              activeTrackColor: context.colors.primary,
-              inactiveTrackColor: context.colors.onBackground.withValues(alpha: 0.2),
-              thumbColor: context.colors.primary,
-              overlayColor: context.colors.primary.withValues(alpha: 0.2),
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
-            ),
-            child: Slider(
-              value: _budgetPerPerson,
-              max: 100,
-              divisions: 20,
-              onChanged: (value) {
-                setState(() {
-                  _budgetPerPerson = value;
-                });
-              },
-            ),
+          CNSlider(
+            value: _budgetPerPerson,
+            min: 0,
+            max: 100,
+            step: 5,
+            onChanged: (double value) {
+              setState(() {
+                _budgetPerPerson = value;
+              });
+            },
           ),
           const Spacer(),
         ],

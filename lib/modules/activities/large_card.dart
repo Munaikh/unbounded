@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:apparence_kit/core/location/providers/user_location_provider.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
@@ -34,6 +36,7 @@ class LargeCard extends StatelessWidget {
         },
         child: Container(
           width: double.infinity,
+          height: 280,
           decoration: ShapeDecoration(
             shape: RoundedSuperellipseBorder(
               borderRadius: BorderRadius.circular(36),
@@ -41,89 +44,234 @@ class LargeCard extends StatelessWidget {
             color: context.colors.surface,
           ),
           clipBehavior: Clip.hardEdge,
-          child: Column(
+          child: Stack(
             children: [
-              SizedBox(
-                height: 200,
-                width: double.infinity,
+              // Full background image
+              Positioned.fill(
                 child: _isValidImageUrl(imageUrl)
                     ? Image.network(
                         imageUrl,
                         fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) {
-                          return Container(color: context.colors.primary.withValues(alpha: 0.35));
+                          return Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  context.colors.primary.withValues(alpha: 0.6),
+                                  context.colors.primary.withValues(alpha: 0.4),
+                                ],
+                              ),
+                            ),
+                          );
                         },
                       )
-                    : Container(color: context.colors.primary.withValues(alpha: 0.35)),
-              ),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: context.textTheme.titleMedium),
-                    const SizedBox(height: 4),
-                    Text(
-                      description,
-                      style: context.textTheme.bodyMedium?.copyWith(
-                        color: context.colors.onSurface.withValues(alpha: .6),
+                    : Container(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                            colors: [
+                              context.colors.primary.withValues(alpha: 0.6),
+                              context.colors.primary.withValues(alpha: 0.4),
+                            ],
+                          ),
+                        ),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Icon(Icons.location_on, size: 16, color: context.colors.primary),
-                        const SizedBox(width: 4),
-                        Consumer(
-                          builder: (context, ref, child) {
-                            final parts = distance.split(',');
-                            var finalDistance = 'N/A';
-                            if (parts.length == 2) {
-                              final lat = double.tryParse(parts[0].trim());
-                              final lng = double.tryParse(parts[1].trim());
-                              if (lat != null && lng != null) {
-                                final userLocation = ref.watch(userLocationProvider.notifier);
-                                userLocation.getUserLocation();
-                                final distanceMeters = userLocation.getDistanceTo(lat, lng);
-                                final distanceKm = (distanceMeters / 1000).toStringAsFixed(1);
-                                finalDistance = '$distanceKm km';
-                              }
-                            }
-                            return Text(
-                              finalDistance,
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colors.primary,
-                              ),
-                            );
-                          },
-                        ),
-                        const SizedBox(width: 16),
-                        Text(
-                          '£ $price',
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colors.primary,
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                        Icon(Icons.group, size: 16, color: context.colors.primary),
-                        const SizedBox(width: 4),
-                        Text(
-                          '$minGroupSize-$maxGroupSize',
-                          style: context.textTheme.bodyMedium?.copyWith(
-                            color: context.colors.primary,
-                          ),
-                        ),
+              ),
+              // Dark gradient overlay for readability
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.2),
+                        Colors.black.withValues(alpha: 0.7),
                       ],
                     ),
-                  ],
+                  ),
+                ),
+              ),
+              // Content with glassmorphism
+              Positioned(
+                left: 16,
+                right: 16,
+                bottom: 16,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Colors.white.withValues(alpha: 0.25),
+                            Colors.white.withValues(alpha: 0.15),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(24),
+                        border: Border.all(
+                          color: Colors.white.withValues(alpha: 0.3),
+                          width: 1,
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            title,
+                            style: context.textTheme.titleLarge?.copyWith(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w700,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withValues(alpha: 0.3),
+                                  offset: const Offset(0, 2),
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            description,
+                            style: context.textTheme.bodyMedium?.copyWith(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              height: 1.4,
+                              shadows: [
+                                Shadow(
+                                  color: Colors.black.withValues(alpha: 0.2),
+                                  offset: const Offset(0, 1),
+                                  blurRadius: 2,
+                                ),
+                              ],
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: [
+                              Consumer(
+                                builder: (context, ref, child) {
+                                  final parts = distance.split(',');
+                                  var finalDistance = 'N/A';
+                                  if (parts.length == 2) {
+                                    final lat = double.tryParse(
+                                      parts[0].trim(),
+                                    );
+                                    final lng = double.tryParse(
+                                      parts[1].trim(),
+                                    );
+                                    if (lat != null && lng != null) {
+                                      final userLocation = ref.watch(
+                                        userLocationProvider.notifier,
+                                      );
+                                      userLocation.getUserLocation();
+                                      final distanceMeters = userLocation
+                                          .getDistanceTo(lat, lng);
+                                      final distanceKm = (distanceMeters / 1000)
+                                          .toStringAsFixed(1);
+                                      finalDistance = '$distanceKm km';
+                                    }
+                                  }
+                                  return _buildInfoChip(
+                                    context,
+                                    Icons.location_on_rounded,
+                                    finalDistance,
+                                  );
+                                },
+                              ),
+                              _buildInfoChip(
+                                context,
+                                Icons.payments_rounded,
+                                '£$price',
+                              ),
+                              _buildInfoChip(
+                                context,
+                                Icons.group_rounded,
+                                '$minGroupSize-$maxGroupSize',
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(BuildContext context, IconData icon, String text) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      decoration: ShapeDecoration(
+        shape: RoundedSuperellipseBorder(
+          borderRadius: BorderRadius.circular(100),
+        ),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            Colors.white.withValues(alpha: 0.3),
+            Colors.white.withValues(alpha: 0.2),
+          ],
+        ),
+        shadows: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: Colors.white,
+            shadows: [
+              Shadow(
+                color: Colors.black.withValues(alpha: 0.3),
+                offset: const Offset(0, 1),
+                blurRadius: 2,
+              ),
+            ],
+          ),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: context.textTheme.labelSmall?.copyWith(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  offset: const Offset(0, 1),
+                  blurRadius: 2,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
