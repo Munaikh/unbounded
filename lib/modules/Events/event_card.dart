@@ -125,7 +125,7 @@ class EventCard extends StatelessWidget {
                               ),
                             ],
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.check_rounded,
                             size: 12,
                             color: Colors.white,
@@ -228,7 +228,6 @@ class EventCard extends StatelessWidget {
                                 ),
                                 border: Border.all(
                                   color: Colors.white.withValues(alpha: 0.4),
-                                  width: 1,
                                 ),
                               ),
                               child: Center(

@@ -6,6 +6,7 @@ import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:apparence_kit/core/widgets/toast.dart';
 import 'package:apparence_kit/modules/activities/large_card.dart';
 import 'package:apparence_kit/modules/activities/providers/filtered_activities_provider.dart';
+import 'package:apparence_kit/modules/home/filter_chip.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -37,7 +38,7 @@ class HomePage extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              // Show preferences card if set
+  
               if (preferences.hasPreferences)
                 Container(
                   padding: const EdgeInsets.all(16),
@@ -99,19 +100,19 @@ class HomePage extends ConsumerWidget {
                         runSpacing: 8,
                         children: [
                           if (preferences.activityType != null && !preferences.surpriseMe)
-                            _FilterChip(label: preferences.activityType!, context: context),
+                            OurFilterChip(label: preferences.activityType!, context: context),
                           if (preferences.budgetPerPerson != null)
-                            _FilterChip(
+                            OurFilterChip(
                               label: '£${preferences.budgetPerPerson!.toInt()}/person',
                               context: context,
                             ),
                           if (preferences.minPeople != null && preferences.maxPeople != null)
-                            _FilterChip(
+                            OurFilterChip(
                               label: '${preferences.minPeople}-${preferences.maxPeople} people',
                               context: context,
                             ),
                           if (preferences.surpriseMe)
-                            _FilterChip(label: 'Surprise Me 🎲', context: context),
+                            OurFilterChip(label: 'Surprise Me 🎲', context: context),
                         ],
                       ),
                       const SizedBox(height: 12),
@@ -236,31 +237,6 @@ class HomePage extends ConsumerWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final BuildContext context;
-
-  const _FilterChip({required this.label, required this.context});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: ShapeDecoration(
-        shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(100)),
-        color: context.colors.surface,
-      ),
-      child: Text(
-        label,
-        style: context.textTheme.bodySmall?.copyWith(
-          color: context.colors.onSurface,
-          fontWeight: FontWeight.w500,
         ),
       ),
     );

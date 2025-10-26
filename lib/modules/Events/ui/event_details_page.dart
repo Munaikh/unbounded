@@ -12,6 +12,7 @@ import 'package:apparence_kit/modules/events/api/events_api.dart';
 import 'package:apparence_kit/modules/events/providers/event_activity_provider.dart';
 import 'package:apparence_kit/modules/events/providers/event_attendees_provider.dart';
 import 'package:apparence_kit/modules/events/providers/user_joined_events_provider.dart';
+import 'package:apparence_kit/modules/events/ui/widgets/info_chip.dart';
 import 'package:apparence_kit/modules/events/ui/widgets/name_input_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -353,12 +354,12 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                                         runSpacing: 12,
                                         children: [
                                           if (event.date != null)
-                                            _GlassInfoChip(
+                                            OurInfoChip(
                                               icon: Icons.calendar_today_rounded,
                                               label: _formatEventDate(event.date!),
                                             ),
                                           if (event.location != null && event.location!.isNotEmpty)
-                                            _GlassInfoChip(
+                                            OurInfoChip(
                                               icon: Icons.location_on_rounded,
                                               label: event.location!,
                                             ),
@@ -745,7 +746,6 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                               ),
                             ),
                             const SizedBox(height: 32),
-                            // Join/Leave button with glassmorphism
                             PressableScale(
                               child: GestureDetector(
                                 onTap: _isProcessing ? null : _toggleJoinEvent,
@@ -850,67 +850,6 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
     } else {
       return DateFormat('MMM d, HH:mm').format(date);
     }
-  }
-}
-
-class _GlassInfoChip extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _GlassInfoChip({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(100),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [Colors.white.withValues(alpha: 0.3), Colors.white.withValues(alpha: 0.2)],
-            ),
-            borderRadius: BorderRadius.circular(100),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.4)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                icon,
-                size: 16,
-                color: Colors.white,
-                shadows: [
-                  Shadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    offset: const Offset(0, 1),
-                    blurRadius: 2,
-                  ),
-                ],
-              ),
-              const SizedBox(width: 8),
-              Text(
-                label,
-                style: context.textTheme.bodyMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      offset: const Offset(0, 1),
-                      blurRadius: 2,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
 

@@ -1,5 +1,5 @@
-import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/theme/colors.dart';
+import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
 import 'package:apparence_kit/modules/events/event_card.dart';
 import 'package:apparence_kit/modules/events/providers/all_events_provider.dart';
@@ -52,7 +52,7 @@ class EventsPage extends ConsumerWidget {
                       child: ListView.separated(
                         scrollDirection: Axis.horizontal,
                         itemCount: joinedEvents.length,
-                        separatorBuilder: (_, __) => const SizedBox(width: 16),
+                        separatorBuilder: (_, _) => const SizedBox(width: 16),
                         itemBuilder: (context, index) {
                           final e = joinedEvents[index];
                           final displayDate = e.date != null
@@ -105,7 +105,7 @@ class EventsPage extends ConsumerWidget {
                   ],
                 );
               },
-              error: (_, __) => const SizedBox.shrink(),
+              error: (_, _) => const SizedBox.shrink(),
               loading: () => const SizedBox.shrink(),
             ),
 
@@ -120,7 +120,7 @@ class EventsPage extends ConsumerWidget {
                   child: ListView.separated(
                     scrollDirection: Axis.horizontal,
                     itemCount: events.length,
-                    separatorBuilder: (_, __) => const SizedBox(width: 16),
+                    separatorBuilder: (_, _) => const SizedBox(width: 16),
                     itemBuilder: (context, index) {
                       final e = events[index];
                       final displayDate = e.date != null

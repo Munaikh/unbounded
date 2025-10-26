@@ -358,7 +358,6 @@ class _UnsplashImagePickerState extends State<UnsplashImagePicker> {
                     },
                   ),
           ),
-          // Powered by Unsplash attribution
           Container(
             padding: const EdgeInsets.symmetric(vertical: 12),
             color: context.colors.surface,
