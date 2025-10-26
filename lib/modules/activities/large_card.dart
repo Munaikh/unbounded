@@ -101,7 +101,7 @@ class LargeCard extends StatelessWidget {
                 right: 16,
                 bottom: 16,
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(28),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
                     child: Container(
@@ -115,7 +115,7 @@ class LargeCard extends StatelessWidget {
                             Colors.white.withValues(alpha: 0.15),
                           ],
                         ),
-                        borderRadius: BorderRadius.circular(24),
+                        borderRadius: BorderRadius.circular(28),
                         border: Border.all(
                           color: Colors.white.withValues(alpha: 0.3),
                           width: 1,
