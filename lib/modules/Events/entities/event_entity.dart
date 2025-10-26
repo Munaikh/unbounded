@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/foundation.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -19,6 +17,7 @@ abstract class EventEntity with _$EventEntity {
     String? bgUrl,
     String? album,
     required String owner,
+    int? activityId,
   }) = _EventEntity;
 
   factory EventEntity.fromJson(Map<String, dynamic> json) => _$EventEntityFromJson(json);

@@ -6,6 +6,7 @@ import 'package:apparence_kit/modules/activities/entity/activity_entity.dart';
 import 'package:apparence_kit/modules/activities/providers/all_activities_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class ActivityDetailPage extends ConsumerWidget {
@@ -168,6 +169,40 @@ class ActivityDetailPage extends ConsumerWidget {
                                   ),
                                 ),
                               ),
+                            if ((activity.website ?? '').isNotEmpty) const SizedBox(height: 12),
+                            PressableScale(
+                              child: GestureDetector(
+                                onTap: () => _navigateToCreateEvent(context, activity!),
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                                  decoration: ShapeDecoration(
+                                    shape: RoundedSuperellipseBorder(
+                                      borderRadius: BorderRadius.circular(100),
+                                    ),
+                                    color: context.colors.primary.withCustomOpacity(0.15),
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.event_outlined,
+                                        color: context.colors.primary,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        'Create Event for this Activity',
+                                        style: context.textTheme.titleMedium?.copyWith(
+                                          color: context.colors.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -211,6 +246,15 @@ class ActivityDetailPage extends ConsumerWidget {
   Future<void> _openWebsite(String url) async {
     final Uri uri = Uri.parse(url);
     await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  void _navigateToCreateEvent(BuildContext context, ActivityEntity activity) {
+    context.push(
+      Uri(
+        path: '/events/create',
+        queryParameters: {'activityId': activity.id.toString(), 'activityName': activity.name},
+      ).toString(),
+    );
   }
 
   bool _isValidImageUrl(String? url) {

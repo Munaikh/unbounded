@@ -54,6 +54,7 @@ class EventsApi {
     DateTime? date,
     String? location,
     String? bgUrl,
+    int? activityId,
   }) async {
     try {
       final response = await client
@@ -64,6 +65,7 @@ class EventsApi {
             'date': date?.toIso8601String(),
             'location': location,
             'bg_url': bgUrl,
+            'activity_id': activityId,
           })
           .select()
           .single();

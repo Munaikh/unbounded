@@ -83,7 +83,12 @@ GoRouter generateRouter({
       GoRoute(
         name: 'create_event',
         path: '/events/create',
-        builder: (context, state) => const CreateEventPage(),
+        builder: (context, state) {
+          final activityIdParam = state.uri.queryParameters['activityId'];
+          final activityId = activityIdParam != null ? int.tryParse(activityIdParam) : null;
+          final activityName = state.uri.queryParameters['activityName'];
+          return CreateEventPage(linkedActivityId: activityId, linkedActivityName: activityName);
+        },
       ),
       GoRoute(
         name: 'event_details',

@@ -6,11 +6,13 @@ import 'package:apparence_kit/modules/events/api/events_api.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 class CreateEventPage extends ConsumerStatefulWidget {
-  const CreateEventPage({super.key});
+  final int? linkedActivityId;
+  final String? linkedActivityName;
+
+  const CreateEventPage({super.key, this.linkedActivityId, this.linkedActivityName});
 
   @override
   ConsumerState<CreateEventPage> createState() => _CreateEventPageState();
@@ -50,9 +52,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       builder: (BuildContext context) => Container(
         height: 300,
         padding: const EdgeInsets.only(top: 6.0),
-        margin: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
+        margin: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         color: CupertinoColors.systemBackground.resolveFrom(context),
         child: SafeArea(
           top: false,
@@ -79,10 +79,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
               ),
               Expanded(
                 child: CupertinoDatePicker(
-                  mode: CupertinoDatePickerMode.dateAndTime,
-                  initialDateTime: initialDate.isBefore(minimumDate)
-                      ? now
-                      : initialDate,
+                  initialDateTime: initialDate.isBefore(minimumDate) ? now : initialDate,
                   minimumDate: minimumDate,
                   maximumDate: now.add(const Duration(days: 365)),
                   onDateTimeChanged: (DateTime newDate) {
@@ -99,15 +96,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
 
   String _formatDateTime(DateTime? dateTime) {
     if (dateTime == null) return '';
-    final weekday = [
-      'Mon',
-      'Tue',
-      'Wed',
-      'Thu',
-      'Fri',
-      'Sat',
-      'Sun',
-    ][dateTime.weekday - 1];
+    final weekday = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][dateTime.weekday - 1];
     final month = [
       'Jan',
       'Feb',
@@ -139,12 +128,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       body: SafeArea(
         bottom: false,
         child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(
-            24,
-            24,
-            24,
-            24 + MediaQuery.of(context).padding.bottom,
-          ),
+          padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -161,11 +145,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           shape: BoxShape.circle,
                           color: context.colors.error.withCustomOpacity(0.1),
                         ),
-                        child: Icon(
-                          Icons.close,
-                          color: context.colors.error,
-                          size: 20,
-                        ),
+                        child: Icon(Icons.close, color: context.colors.error, size: 20),
                       ),
                     ),
                   ),
@@ -190,11 +170,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         ),
                       ],
                     ),
-                    child: const Icon(
-                      Icons.image_outlined,
-                      color: Colors.white,
-                      size: 48,
-                    ),
+                    child: const Icon(Icons.image_outlined, color: Colors.white, size: 48),
                   ),
                 ),
               ),
@@ -206,9 +182,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                   child: Container(
                     height: 56,
                     decoration: ShapeDecoration(
-                      shape: RoundedSuperellipseBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
+                      shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
                       color: context.colors.error.withCustomOpacity(0.8),
                       shadows: [
                         BoxShadow(
@@ -233,9 +207,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
               Container(
                 clipBehavior: Clip.hardEdge,
                 decoration: ShapeDecoration(
-                  shape: RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
+                  shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
                   color: context.colors.surface,
                   shadows: [
                     BoxShadow(
@@ -257,23 +229,16 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     focusedBorder: InputBorder.none,
                     errorBorder: InputBorder.none,
                     focusedErrorBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 18,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                   ),
-                  style: context.textTheme.bodyLarge?.copyWith(
-                    color: context.colors.onSurface,
-                  ),
+                  style: context.textTheme.bodyLarge?.copyWith(color: context.colors.onSurface),
                 ),
               ),
               const SizedBox(height: 16),
               Container(
                 clipBehavior: Clip.hardEdge,
                 decoration: ShapeDecoration(
-                  shape: RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
+                  shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
                   color: context.colors.surface,
                   shadows: [
                     BoxShadow(
@@ -296,14 +261,9 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     focusedBorder: InputBorder.none,
                     errorBorder: InputBorder.none,
                     focusedErrorBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 18,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                   ),
-                  style: context.textTheme.bodyLarge?.copyWith(
-                    color: context.colors.onSurface,
-                  ),
+                  style: context.textTheme.bodyLarge?.copyWith(color: context.colors.onSurface),
                 ),
               ),
               const SizedBox(height: 16),
@@ -314,9 +274,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                   child: Container(
                     height: 64,
                     decoration: ShapeDecoration(
-                      shape: RoundedSuperellipseBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
+                      shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
                       color: context.colors.surface,
                       shadows: [
                         BoxShadow(
@@ -331,9 +289,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                       children: [
                         Icon(
                           Icons.calendar_today,
-                          color: context.colors.onSurface.withCustomOpacity(
-                            0.6,
-                          ),
+                          color: context.colors.onSurface.withCustomOpacity(0.6),
                           size: 20,
                         ),
                         const SizedBox(width: 16),
@@ -345,8 +301,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                               Text(
                                 'Date',
                                 style: context.textTheme.labelSmall?.copyWith(
-                                  color: context.colors.onSurface
-                                      .withCustomOpacity(0.6),
+                                  color: context.colors.onSurface.withCustomOpacity(0.6),
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -362,9 +317,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         ),
                         Icon(
                           Icons.keyboard_arrow_down,
-                          color: context.colors.onSurface.withCustomOpacity(
-                            0.6,
-                          ),
+                          color: context.colors.onSurface.withCustomOpacity(0.6),
                         ),
                       ],
                     ),
@@ -375,9 +328,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
               Container(
                 clipBehavior: Clip.hardEdge,
                 decoration: ShapeDecoration(
-                  shape: RoundedSuperellipseBorder(
-                    borderRadius: BorderRadius.circular(28),
-                  ),
+                  shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
                   color: context.colors.surface,
                   shadows: [
                     BoxShadow(
@@ -403,16 +354,55 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                     focusedBorder: InputBorder.none,
                     errorBorder: InputBorder.none,
                     focusedErrorBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 18,
-                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                   ),
-                  style: context.textTheme.bodyLarge?.copyWith(
-                    color: context.colors.onSurface,
-                  ),
+                  style: context.textTheme.bodyLarge?.copyWith(color: context.colors.onSurface),
                 ),
               ),
+              if (widget.linkedActivityName != null) ...[
+                const SizedBox(height: 16),
+                Container(
+                  decoration: ShapeDecoration(
+                    shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
+                    color: context.colors.primary.withCustomOpacity(0.1),
+                    shadows: [
+                      BoxShadow(
+                        color: context.colors.shadow.withCustomOpacity(0.06),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                  child: Row(
+                    children: [
+                      Icon(Icons.link, color: context.colors.primary, size: 20),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Linked Activity',
+                              style: context.textTheme.labelSmall?.copyWith(
+                                color: context.colors.primary.withCustomOpacity(0.8),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              widget.linkedActivityName!,
+                              style: context.textTheme.bodyMedium?.copyWith(
+                                color: context.colors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
               const SizedBox(height: 32),
               PressableScale(
                 child: GestureDetector(
@@ -421,9 +411,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                   child: Container(
                     height: 60,
                     decoration: ShapeDecoration(
-                      shape: RoundedSuperellipseBorder(
-                        borderRadius: BorderRadius.circular(28),
-                      ),
+                      shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
                       color: _isCreating
                           ? context.colors.primary.withCustomOpacity(0.6)
                           : context.colors.primary,
@@ -435,9 +423,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                             height: 24,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                context.colors.onPrimary,
-                              ),
+                              valueColor: AlwaysStoppedAnimation<Color>(context.colors.onPrimary),
                             ),
                           )
                         : Text(
@@ -479,14 +465,15 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
         title: _titleController.text.trim(),
         description: _descriptionController.text.trim(),
         date: _date,
-        location: _locationController.text.trim().isEmpty
-            ? null
-            : _locationController.text.trim(),
+        location: _locationController.text.trim().isEmpty ? null : _locationController.text.trim(),
+        activityId: widget.linkedActivityId,
       );
 
       if (mounted) {
         // Show success message
-        ref.read(toastProvider).success(title: 'Event created successfully!', text: 'Event created successfully!');
+        ref
+            .read(toastProvider)
+            .success(title: 'Event created successfully!', text: 'Event created successfully!');
       }
     } catch (e) {
       ref.read(toastProvider).error(title: 'Error', text: 'Failed to create event: $e');
