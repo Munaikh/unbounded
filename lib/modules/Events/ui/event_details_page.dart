@@ -664,7 +664,9 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                                                                   begin: Alignment.topLeft,
                                                                   end: Alignment.bottomRight,
                                                                   colors: [
-                                                                    Colors.white.withValues(alpha: 0.3),
+                                                                    Colors.white.withValues(
+                                                                      alpha: 0.3,
+                                                                    ),
                                                                     Colors.white.withValues(
                                                                       alpha: 0.15,
                                                                     ),
@@ -679,15 +681,22 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                                                               child: Center(
                                                                 child: Text(
                                                                   _initialsFromName(u.name ?? ''),
-                                                                  style: context.textTheme.bodyMedium
+                                                                  style: context
+                                                                      .textTheme
+                                                                      .bodyMedium
                                                                       ?.copyWith(
                                                                         color: Colors.white,
                                                                         fontWeight: FontWeight.w600,
                                                                         shadows: [
                                                                           Shadow(
                                                                             color: Colors.black
-                                                                                .withValues(alpha: 0.3),
-                                                                            offset: const Offset(0, 1),
+                                                                                .withValues(
+                                                                                  alpha: 0.3,
+                                                                                ),
+                                                                            offset: const Offset(
+                                                                              0,
+                                                                              1,
+                                                                            ),
                                                                             blurRadius: 2,
                                                                           ),
                                                                         ],
@@ -700,9 +709,8 @@ class _EventDetailsPageState extends ConsumerState<EventDetailsPage> {
                                                         const SizedBox(width: 12),
                                                         Text(
                                                           u.name ?? '',
-                                                          style: context.textTheme.bodyLarge?.copyWith(
-                                                            color: Colors.white,
-                                                          ),
+                                                          style: context.textTheme.bodyLarge
+                                                              ?.copyWith(color: Colors.white),
                                                         ),
                                                       ],
                                                     ),
