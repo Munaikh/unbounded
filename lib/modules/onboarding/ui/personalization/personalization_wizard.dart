@@ -73,17 +73,21 @@ class _PersonalizationWizardState extends ConsumerState<PersonalizationWizard> {
       selections.add('Type: $_activityType');
     }
 
-    if (mounted) {
-      ref
-          .read(toastProvider)
-          .success(title: 'Preferences saved', text: 'Preferences saved: ${selections.join(', ')}');
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   SnackBar(
-      //     content: Text('Preferences saved: ${selections.join(', ')}'),
-      //     duration: const Duration(seconds: 3),
-      //   ),
-      // );
-      // context.pop();
+    if (mounted && context.mounted) {
+      // Pop first, then show toast
+      context.pop();
+
+      // Show toast after a short delay to ensure the navigation completes
+      Future.delayed(const Duration(milliseconds: 100), () {
+        if (mounted) {
+          ref
+              .read(toastProvider)
+              .success(
+                title: 'Preferences saved',
+                text: 'Preferences saved: ${selections.join(', ')}',
+              );
+        }
+      });
     }
   }
 
