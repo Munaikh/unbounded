@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:apparence_kit/core/theme/colors.dart';
 import 'package:apparence_kit/core/theme/extensions/theme_extension.dart';
 import 'package:apparence_kit/core/widgets/buttons/pressable_scale.dart';
@@ -273,171 +275,92 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.colors.background,
-      body: SafeArea(
-        bottom: false,
-        child: SingleChildScrollView(
-          padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          // Background image with blur
+          if (_backgroundImageUrl != null)
+            Image.network(
+              _backgroundImageUrl!,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(color: context.colors.background);
+              },
+            ),
+          if (_backgroundImageUrl != null)
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+              child: Container(color: Colors.black.withValues(alpha: 0.3)),
+            ),
+          // Content
+          SafeArea(
+            bottom: false,
+            child: SingleChildScrollView(
+              padding: EdgeInsets.fromLTRB(24, 24, 24, 24 + MediaQuery.of(context).padding.bottom),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Row(
+                    children: [
+                      PressableScale(
+                        child: GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          behavior: HitTestBehavior.opaque,
+                          child: Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _backgroundImageUrl != null
+                                  ? Colors.white.withValues(alpha: 0.2)
+                                  : context.colors.error.withCustomOpacity(0.1),
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              color: _backgroundImageUrl != null
+                                  ? Colors.white
+                                  : context.colors.error,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
                   PressableScale(
                     child: GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
+                      onTap: _showImageSourceOptions,
                       behavior: HitTestBehavior.opaque,
                       child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: context.colors.error.withCustomOpacity(0.1),
+                        height: 56,
+                        decoration: ShapeDecoration(
+                          shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
+                          color: _backgroundImageUrl != null
+                              ? Colors.white.withValues(alpha: 0.2)
+                              : context.colors.error.withCustomOpacity(0.8),
+                          shadows: [
+                            BoxShadow(
+                              color: context.colors.shadow.withCustomOpacity(0.12),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
                         ),
-                        child: Icon(Icons.close, color: context.colors.error, size: 20),
+                        alignment: Alignment.center,
+                        child: Text(
+                          _backgroundImageUrl != null ? 'Change Background' : 'Add Background',
+                          style: context.textTheme.titleMedium?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
                   ),
-                ],
-              ),
-              const SizedBox(height: 24),
-              PressableScale(
-                child: GestureDetector(
-                  onTap: _showImageSourceOptions,
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: context.colors.error.withCustomOpacity(0.8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: context.colors.shadow.withCustomOpacity(0.15),
-                          blurRadius: 24,
-                          offset: const Offset(0, 12),
-                        ),
-                      ],
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    child: _backgroundImageUrl != null
-                        ? Stack(
-                            fit: StackFit.expand,
-                            children: [
-                              Image.network(_backgroundImageUrl!, fit: BoxFit.cover),
-                              Positioned.fill(
-                                child: ColoredBox(
-                                  color: Colors.black.withValues(alpha: 0.3),
-                                  child: const Icon(Icons.edit, color: Colors.white, size: 32),
-                                ),
-                              ),
-                            ],
-                          )
-                        : const Icon(Icons.image_outlined, color: Colors.white, size: 48),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              PressableScale(
-                child: GestureDetector(
-                  onTap: _showImageSourceOptions,
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    height: 56,
-                    decoration: ShapeDecoration(
-                      shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
-                      color: _backgroundImageUrl != null
-                          ? context.colors.primary.withCustomOpacity(0.8)
-                          : context.colors.error.withCustomOpacity(0.8),
-                      shadows: [
-                        BoxShadow(
-                          color: context.colors.shadow.withCustomOpacity(0.12),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      _backgroundImageUrl != null ? 'Change Background' : 'Add Background',
-                      style: context.textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 32),
-              Container(
-                clipBehavior: Clip.hardEdge,
-                decoration: ShapeDecoration(
-                  shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
-                  color: context.colors.surface,
-                  shadows: [
-                    BoxShadow(
-                      color: context.colors.shadow.withCustomOpacity(0.06),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: _titleController,
-                  decoration: InputDecoration(
-                    hintText: 'Enter a short title',
-                    hintStyle: context.textTheme.bodyLarge?.copyWith(
-                      color: context.colors.onSurface.withCustomOpacity(0.4),
-                    ),
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                  ),
-                  style: context.textTheme.bodyLarge?.copyWith(color: context.colors.onSurface),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                clipBehavior: Clip.hardEdge,
-                decoration: ShapeDecoration(
-                  shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
-                  color: context.colors.surface,
-                  shadows: [
-                    BoxShadow(
-                      color: context.colors.shadow.withCustomOpacity(0.06),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: _descriptionController,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: 'Description',
-                    hintStyle: context.textTheme.bodyLarge?.copyWith(
-                      color: context.colors.onSurface.withCustomOpacity(0.4),
-                    ),
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                  ),
-                  style: context.textTheme.bodyLarge?.copyWith(color: context.colors.onSurface),
-                ),
-              ),
-              const SizedBox(height: 16),
-              PressableScale(
-                child: GestureDetector(
-                  onTap: _pickDate,
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    height: 64,
+                  const SizedBox(height: 32),
+                  Container(
+                    clipBehavior: Clip.hardEdge,
                     decoration: ShapeDecoration(
                       shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
                       color: context.colors.surface,
@@ -449,162 +372,233 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                         ),
                       ],
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.calendar_today,
-                          color: context.colors.onSurface.withCustomOpacity(0.6),
-                          size: 20,
+                    child: TextField(
+                      controller: _titleController,
+                      decoration: InputDecoration(
+                        hintText: 'Enter a short title',
+                        hintStyle: context.textTheme.bodyLarge?.copyWith(
+                          color: context.colors.onSurface.withCustomOpacity(0.4),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                'Date',
-                                style: context.textTheme.labelSmall?.copyWith(
-                                  color: context.colors.onSurface.withCustomOpacity(0.6),
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                _formatDateTime(_date ?? DateTime.now()),
-                                style: context.textTheme.bodyMedium?.copyWith(
-                                  color: context.colors.onSurface,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Icon(
-                          Icons.keyboard_arrow_down,
-                          color: context.colors.onSurface.withCustomOpacity(0.6),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                      ),
+                      style: context.textTheme.bodyLarge?.copyWith(color: context.colors.onSurface),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Container(
+                    clipBehavior: Clip.hardEdge,
+                    decoration: ShapeDecoration(
+                      shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
+                      color: context.colors.surface,
+                      shadows: [
+                        BoxShadow(
+                          color: context.colors.shadow.withCustomOpacity(0.06),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Container(
-                clipBehavior: Clip.hardEdge,
-                decoration: ShapeDecoration(
-                  shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
-                  color: context.colors.surface,
-                  shadows: [
-                    BoxShadow(
-                      color: context.colors.shadow.withCustomOpacity(0.06),
-                      blurRadius: 16,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: TextField(
-                  controller: _locationController,
-                  decoration: InputDecoration(
-                    hintText: 'Location',
-                    hintStyle: context.textTheme.bodyLarge?.copyWith(
-                      color: context.colors.onSurface.withCustomOpacity(0.4),
-                    ),
-                    prefixIcon: Icon(
-                      Icons.location_on_outlined,
-                      color: context.colors.onSurface.withCustomOpacity(0.6),
-                    ),
-                    border: InputBorder.none,
-                    enabledBorder: InputBorder.none,
-                    focusedBorder: InputBorder.none,
-                    errorBorder: InputBorder.none,
-                    focusedErrorBorder: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                  ),
-                  style: context.textTheme.bodyLarge?.copyWith(color: context.colors.onSurface),
-                ),
-              ),
-              if (widget.linkedActivityName != null) ...[
-                const SizedBox(height: 16),
-                Container(
-                  decoration: ShapeDecoration(
-                    shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
-                    color: context.colors.primary.withCustomOpacity(0.1),
-                    shadows: [
-                      BoxShadow(
-                        color: context.colors.shadow.withCustomOpacity(0.06),
-                        blurRadius: 16,
-                        offset: const Offset(0, 4),
+                    child: TextField(
+                      controller: _descriptionController,
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        hintText: 'Description',
+                        hintStyle: context.textTheme.bodyLarge?.copyWith(
+                          color: context.colors.onSurface.withCustomOpacity(0.4),
+                        ),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
                       ),
-                    ],
+                      style: context.textTheme.bodyLarge?.copyWith(color: context.colors.onSurface),
+                    ),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-                  child: Row(
-                    children: [
-                      Icon(Icons.link, color: context.colors.primary, size: 20),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(height: 16),
+                  PressableScale(
+                    child: GestureDetector(
+                      onTap: _pickDate,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        height: 64,
+                        decoration: ShapeDecoration(
+                          shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
+                          color: context.colors.surface,
+                          shadows: [
+                            BoxShadow(
+                              color: context.colors.shadow.withCustomOpacity(0.06),
+                              blurRadius: 16,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Row(
                           children: [
-                            Text(
-                              'Linked Activity',
-                              style: context.textTheme.labelSmall?.copyWith(
-                                color: context.colors.primary.withCustomOpacity(0.8),
+                            Icon(
+                              Icons.calendar_today,
+                              color: context.colors.onSurface.withCustomOpacity(0.6),
+                              size: 20,
+                            ),
+                            const SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    'Date',
+                                    style: context.textTheme.labelSmall?.copyWith(
+                                      color: context.colors.onSurface.withCustomOpacity(0.6),
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    _formatDateTime(_date ?? DateTime.now()),
+                                    style: context.textTheme.bodyMedium?.copyWith(
+                                      color: context.colors.onSurface,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                            const SizedBox(height: 2),
-                            Text(
-                              widget.linkedActivityName!,
-                              style: context.textTheme.bodyMedium?.copyWith(
-                                color: context.colors.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              color: context.colors.onSurface.withCustomOpacity(0.6),
                             ),
                           ],
                         ),
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ],
-              const SizedBox(height: 32),
-              PressableScale(
-                child: GestureDetector(
-                  onTap: _isCreating ? null : _createEvent,
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    height: 60,
+                  const SizedBox(height: 16),
+                  Container(
+                    clipBehavior: Clip.hardEdge,
                     decoration: ShapeDecoration(
                       shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
-                      color: _isCreating
-                          ? context.colors.primary.withCustomOpacity(0.6)
-                          : context.colors.primary,
+                      color: context.colors.surface,
+                      shadows: [
+                        BoxShadow(
+                          color: context.colors.shadow.withCustomOpacity(0.06),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    alignment: Alignment.center,
-                    child: _isCreating
-                        ? SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(context.colors.onPrimary),
-                            ),
-                          )
-                        : Text(
-                            'Create Event',
-                            style: context.textTheme.titleMedium?.copyWith(
-                              color: context.colors.onPrimary,
-                              fontWeight: FontWeight.w600,
+                    child: TextField(
+                      controller: _locationController,
+                      decoration: InputDecoration(
+                        hintText: 'Location',
+                        hintStyle: context.textTheme.bodyLarge?.copyWith(
+                          color: context.colors.onSurface.withCustomOpacity(0.4),
+                        ),
+                        prefixIcon: Icon(
+                          Icons.location_on_outlined,
+                          color: context.colors.onSurface.withCustomOpacity(0.6),
+                        ),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        errorBorder: InputBorder.none,
+                        focusedErrorBorder: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                      ),
+                      style: context.textTheme.bodyLarge?.copyWith(color: context.colors.onSurface),
+                    ),
+                  ),
+                  if (widget.linkedActivityName != null) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      decoration: ShapeDecoration(
+                        shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
+                        color: context.colors.primary.withCustomOpacity(0.1),
+                        shadows: [
+                          BoxShadow(
+                            color: context.colors.shadow.withCustomOpacity(0.06),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+                      child: Row(
+                        children: [
+                          Icon(Icons.link, color: context.colors.primary, size: 20),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Linked Activity',
+                                  style: context.textTheme.labelSmall?.copyWith(
+                                    color: context.colors.primary.withCustomOpacity(0.8),
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  widget.linkedActivityName!,
+                                  style: context.textTheme.bodyMedium?.copyWith(
+                                    color: context.colors.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 32),
+                  PressableScale(
+                    child: GestureDetector(
+                      onTap: _isCreating ? null : _createEvent,
+                      behavior: HitTestBehavior.opaque,
+                      child: Container(
+                        height: 60,
+                        decoration: ShapeDecoration(
+                          shape: RoundedSuperellipseBorder(borderRadius: BorderRadius.circular(28)),
+                          color: _isCreating
+                              ? context.colors.primary.withCustomOpacity(0.6)
+                              : context.colors.primary,
+                        ),
+                        alignment: Alignment.center,
+                        child: _isCreating
+                            ? SizedBox(
+                                width: 24,
+                                height: 24,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    context.colors.onPrimary,
+                                  ),
+                                ),
+                              )
+                            : Text(
+                                'Create Event',
+                                style: context.textTheme.titleMedium?.copyWith(
+                                  color: context.colors.onPrimary,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 32),
+                ],
               ),
-              const SizedBox(height: 32),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }
