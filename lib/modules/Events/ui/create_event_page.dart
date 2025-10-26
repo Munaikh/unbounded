@@ -211,10 +211,9 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
               _backgroundImageUrl = imagePublicUrl;
               _isUploadingImage = false;
             });
-            ref.read(toastProvider).success(
-                  title: 'Image Uploaded',
-                  text: 'Background image uploaded successfully',
-                );
+            ref
+                .read(toastProvider)
+                .success(title: 'Image Uploaded', text: 'Background image uploaded successfully');
           }
         }
       }
@@ -223,10 +222,7 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
         setState(() {
           _isUploadingImage = false;
         });
-        ref.read(toastProvider).error(
-              title: 'Upload Failed',
-              text: 'Failed to upload image: $e',
-            );
+        ref.read(toastProvider).error(title: 'Upload Failed', text: 'Failed to upload image: $e');
       }
     }
   }
@@ -403,8 +399,8 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                           color: _isUploadingImage
                               ? context.colors.primary.withCustomOpacity(0.6)
                               : _backgroundImageUrl != null
-                                  ? Colors.white.withValues(alpha: 0.2)
-                                  : context.colors.error.withCustomOpacity(0.8),
+                              ? Colors.white.withValues(alpha: 0.2)
+                              : context.colors.error.withCustomOpacity(0.8),
                           shadows: [
                             BoxShadow(
                               color: context.colors.shadow.withCustomOpacity(0.12),
@@ -438,7 +434,9 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
                                 ],
                               )
                             : Text(
-                                _backgroundImageUrl != null ? 'Change Background' : 'Add Background',
+                                _backgroundImageUrl != null
+                                    ? 'Change Background'
+                                    : 'Add Background',
                                 style: context.textTheme.titleMedium?.copyWith(
                                   color: Colors.white,
                                   fontWeight: FontWeight.w600,
@@ -721,14 +719,18 @@ class _CreateEventPageState extends ConsumerState<CreateEventPage> {
       if (mounted) {
         // Invalidate events provider to refresh the list
         ref.invalidate(allEventsProvider);
-        
-        // Show success message
-        ref
-            .read(toastProvider)
-            .success(title: 'Event Created', text: 'Your event has been created successfully!');
-        
-        // Dismiss the create event page
+
+        // Dismiss the create event page first
         Navigator.of(context).pop();
+
+        // Show success message after navigation completes
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ref
+                .read(toastProvider)
+                .success(title: 'Event Created', text: 'Your event has been created successfully!');
+          }
+        });
       }
     } catch (e) {
       if (mounted) {
