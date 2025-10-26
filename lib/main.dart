@@ -136,6 +136,7 @@ class MyApp extends ConsumerWidget {
           theme: ThemeProvider.of(context).light,
           darkTheme: ThemeProvider.of(context).dark,
           themeMode: ThemeProvider.of(context).mode,
+          debugShowCheckedModeBanner: false,
           routerConfig: goRouter,
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
