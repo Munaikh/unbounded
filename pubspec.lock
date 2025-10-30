@@ -1105,10 +1105,10 @@ packages:
     dependency: "direct main"
     description:
       name: liquid_glass_renderer
-      sha256: c13d30d31d1244bccd56b1cce9f8121241c4e4b8c10d57c81329c2919beb38b3
+      sha256: db59571a3ec02b18435be599002dac715ddd36cd2fc915f98131d54f993257b7
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1-dev.26"
+    version: "0.2.0-dev.1"
   logger:
     dependency: "direct main"
     description:
