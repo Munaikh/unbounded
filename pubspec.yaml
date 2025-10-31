@@ -72,7 +72,7 @@ dependencies:
   slang: ^4.9.2
   slang_flutter: ^4.9.0
   ionicons: ^0.2.2
-  liquid_glass_renderer: ^0.1.1-dev.26
+  liquid_glass_renderer: ^0.2.0-dev.2
   geocoding: ^4.0.0
   geolocator: ^14.0.0
   unsplash_client: ^3.0.0
